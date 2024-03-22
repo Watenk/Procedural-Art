@@ -28,6 +28,10 @@ public static class MathUtility{
     public static float Map(float value, float fromSource, float toSource, float fromTarget, float toTarget){
         return (value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget;
     }
+
+    public static float SetDecimals(float value, int decimals){
+        return Mathf.Round(value * (10f * decimals)) / (10f * decimals);
+    }
 }
 
 public static class ColorUtility{

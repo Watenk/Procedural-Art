@@ -17,4 +17,11 @@ public enum Events
     OnLoad,
     OnMouseScroll,
     OnMousePosChange,
+
+    // Profiler
+    OnProfilerInit,
+    OnProfilerStart,
+    OnProfilerStop,
+    OnProfilerCalcTimes,
+    OnProfilerUPS,
 }

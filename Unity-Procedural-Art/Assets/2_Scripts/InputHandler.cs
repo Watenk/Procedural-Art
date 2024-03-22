@@ -15,9 +15,9 @@ public class InputHandler : IUpdateable
     //---------------------------------------------------------
 
     private void MouseInputs(){
-        if (Input.GetKey(KeyCode.Mouse0)) { EventManager.Invoke(Events.OnLeftMouse); }
+        //if (Input.GetKey(KeyCode.Mouse0)) { EventManager.Invoke(Events.OnLeftMouse); }
         if (Input.GetKeyDown(KeyCode.Mouse0)) { EventManager.Invoke(Events.OnLeftMouseDown); }
-        if (Input.GetKeyUp(KeyCode.Mouse0)) { EventManager.Invoke(Events.OnLeftMouseUp); }
+        //if (Input.GetKeyUp(KeyCode.Mouse0)) { EventManager.Invoke(Events.OnLeftMouseUp); }
         if (Input.GetKeyDown(KeyCode.Mouse1)) { EventManager.Invoke(Events.OnRightMouseDown); }
         if (Input.GetKeyUp(KeyCode.Mouse1)) { EventManager.Invoke(Events.OnRightMouseUp); }
         if (Input.GetKeyDown(KeyCode.Mouse2)) { EventManager.Invoke(Events.OnMiddleMouseDown); }

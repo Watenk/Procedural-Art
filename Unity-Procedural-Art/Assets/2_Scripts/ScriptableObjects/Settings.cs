@@ -26,6 +26,9 @@ public class Settings : ScriptableObject
     public float MaxCamSize;
     public float ScrollSpeed;
 
+    [Header("Physics")]
+    public float UPSTarget;
+
     [Header("Grid")]
     public Vector2Int GridSize;
 
@@ -38,4 +41,8 @@ public class Settings : ScriptableObject
     public Vector2Int SpriteTextureSize;
     [Tooltip("Amount of uv texture that is cut off to prevent graphical artifacts due to float precition")]
     public Vector2 UVFloatErrorMargin;
+
+    [Header("UI")]
+    [Tooltip("In Seconds")]
+    public float ProfilerUpdateSpeed;
 }
