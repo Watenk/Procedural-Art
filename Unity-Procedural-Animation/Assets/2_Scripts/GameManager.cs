@@ -24,7 +24,11 @@ public class GameManager : MonoBehaviour
     public void Start(){
         instance = this;
 
-        AddService(new TreeManager());
+        AddService(new GridManager());
+        AddService(new GridRenderer());
+        AddService(new PlantManager());
+        AddService(new InputHandler());
+        AddService(new CameraController());
     }
 
     public void Update(){
