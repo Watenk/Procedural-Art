@@ -10,21 +10,23 @@ public class GridRenderer : IUpdateable
     private MeshFilter[,] meshFilters;
     private Dictionary<Cells, Vector2> atlasUV00 = new Dictionary<Cells, Vector2>();
     private Dictionary<Cells, Vector2> atlasUV11 = new Dictionary<Cells, Vector2>();
-    private List<Vector2Int>[,] changedCells;
 
     // Cache
+    private List<Vector2Int>[,] changedCells;
     private Vector2Int chunkSize;
     private Vector2Int chunksAmount;
     private Vector2Int gridSize;
 
     // Dependencies
-    private GridManager gridManager;
+    private IGridDrawable changedCellsGrid;
+    private IGrid grid;
 
     //-----------------------------------------------
 
     public GridRenderer(){
-        gridManager = GameManager.GetService<GridManager>();
-        gridSize = gridManager.GridSize;
+        grid = GameManager.GetService<GridManager>();
+        changedCellsGrid = GameManager.GetService<GridManager>();
+        gridSize = grid.GridSize;
         chunkSize = Settings.Instance.DesiredChunkSize;
 
         if (gridSize.x < chunkSize.x) chunkSize.x = gridSize.x;
@@ -43,14 +45,14 @@ public class GridRenderer : IUpdateable
 
     public void OnUpdate(){
 
-        List<Vector2Int> gridChangedCells = gridManager.GetChangedCells();
-
         // // StressTest
         // for (int y = 0; y < gridSize.y; y++){
         //     for (int x = 0; x < gridSize.x; x++){
         //         gridChangedCells.Add(new Vector2Int(x, y));
         //     }
         // }
+
+        List<Vector2Int> gridChangedCells = changedCellsGrid.GetChangedCells();
 
         // Sort changed Cells
         foreach (Vector2Int current in gridChangedCells){
@@ -66,7 +68,7 @@ public class GridRenderer : IUpdateable
             }
         }
 
-        gridManager.ClearChangedCells();
+        changedCellsGrid.ClearChangedCells();
     }
 
     //---------------------------------------------------------------
@@ -133,7 +135,7 @@ public class GridRenderer : IUpdateable
             for (int x = 0; x < size.x; x++){
 
                 Vector2Int chunkOrgin = CalcChunkOrgin(chunkIndex);
-                Cell currentCell = gridManager.GetCell(new Vector2Int(chunkOrgin.x + x, chunkOrgin.y + y));
+                Cell currentCell = grid.GetCell(new Vector2Int(chunkOrgin.x + x, chunkOrgin.y + y));
 
                 // Vertices
                 // This generates 4 vertices clockwise because a quad had 4 vertices
@@ -184,7 +186,7 @@ public class GridRenderer : IUpdateable
         foreach (Vector2Int currentCellPos in changedCellsInChunk){
 
             Vector2Int chunkOrgin = CalcChunkOrgin(chunkIndex);
-            Cell currentCell = gridManager.GetCell(currentCellPos);
+            Cell currentCell = grid.GetCell(currentCellPos);
             int index = (currentCellPos.x - chunkOrgin.x) + (currentCellPos.y - chunkOrgin.y) * chunkSize.y;
             int verticeIndex = 4 * index;
 

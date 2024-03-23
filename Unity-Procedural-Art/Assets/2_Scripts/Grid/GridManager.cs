@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Watenk;
 
-public class GridManager
+public class GridManager : IGrid, IGridDrawable
 {
     public Vector2Int GridSize { get; private set; }
     
@@ -21,35 +21,34 @@ public class GridManager
         cells = new Cell[GridSize.x, GridSize.y];
         for (int y = 0; y < GridSize.y; y++){
             for(int x = 0; x < GridSize.x; x++){
-                cells[x, y] = new Cell(Cells.air);
+                Cell newCell = new Cell(new Vector2Int(x, y), this);
+                newCell.Cells = Cells.air;
+                cells[x, y] = newCell;
             }
         }
     }
 
-    public Cell GetCell(Vector2Int pos){
-        if (!isInBounds(pos)) return null;
+    public ref Cell GetCell(Vector2Int pos){
+        if (!IsInBounds(pos)) Debug.Log("Tried to get Cell out of bounds");
 
-        return cells[pos.x, pos.y];
+        return ref cells[pos.x, pos.y];
     }
 
-    public void SetCell(Vector2Int pos, Cells cells){
-        if (!isInBounds(pos)) return;
-
-        Cell cell = GetCell(pos);
-        cell.SetCells(cells);
-        changedCells.Add(pos);
-    }
-
-    public bool isInBounds(Vector2Int pos){
+    public bool IsInBounds(Vector2Int pos){
         if (GridUtility.IsInBounds(pos, Vector2Int.zero, GridSize)) return true;
         else return false;
     }
 
+    // Changed Cells
     public List<Vector2Int> GetChangedCells(){
         return changedCells;
     }
 
     public void ClearChangedCells(){
         changedCells.Clear();
+    }
+
+    public void AddChangedCell(Vector2Int pos){
+        changedCells.Add(pos);
     }
 }

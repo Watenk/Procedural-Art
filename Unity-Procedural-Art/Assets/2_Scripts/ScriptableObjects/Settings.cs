@@ -46,6 +46,11 @@ public class Settings : ScriptableObject
     [Tooltip("In Seconds")]
     public float ProfilerUpdateSpeed;
 
+    [Header("Light")]
+    public int MinLight;
+    public int MaxLight;
+
+
     [Header("Plants")]
     [Tooltip("How many genes 1 plant has")]
     public int GeneAmount;
