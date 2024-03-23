@@ -32,6 +32,18 @@ public static class MathUtility{
     public static float SetDecimals(float value, int decimals){
         return Mathf.Round(value * (10f * decimals)) / (10f * decimals);
     }
+
+    public static bool IsInBounds(float value, float bound1, float bound2){
+        if (value < bound1 || value >= bound2) { return false; }
+        if (value < bound1 || value >= bound2) { return false; }
+        return true;
+    }
+
+    public static bool IsInBounds(int value, int bound1, int bound2){
+        if (value < bound1 || value >= bound2) { return false; }
+        if (value < bound1 || value >= bound2) { return false; }
+        return true;
+    }
 }
 
 public static class ColorUtility{

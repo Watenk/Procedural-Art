@@ -45,4 +45,14 @@ public class Settings : ScriptableObject
     [Header("UI")]
     [Tooltip("In Seconds")]
     public float ProfilerUpdateSpeed;
+
+    [Header("Plants")]
+    [Tooltip("How many genes 1 plant has")]
+    public int GeneAmount;
+    [Tooltip("How many inactive genes 1 plant has (Amount of genes that will not grow in a genome)")]
+    public int InactiveGeneAmount;
+    [Tooltip("Chance a seed gene mutates")]
+    public float GeneMutationChance;
+    [Tooltip("Chance a certain chromosome (direction) mutates if a gene mutates")]
+    public float ChromosomeMutationChance;
 }

@@ -32,8 +32,10 @@ public class GameManager : MonoBehaviour
         AddService(new Profiler());
 
         AddService(new GridManager());
+        MapGenerator mapGenerator = new MapGenerator();
         AddService(new GridRenderer());
-        //AddService(new PlantManager());
+        AddService(new LightManager());
+        AddService(new PlantManager());
 
         AddService(new InputHandler());
         AddService(new CameraController());

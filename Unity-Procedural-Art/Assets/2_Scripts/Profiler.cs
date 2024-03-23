@@ -85,7 +85,7 @@ public class Profiler
 
     private Stopwatch GetStopwatch(Type type){
         if (UpdateStopwatches.TryGetValue(type, out Stopwatch updateStopwatch)) return updateStopwatch;
-        else if (UpdateStopwatches.TryGetValue(type, out Stopwatch physicsUpdateStopwatch)) return physicsUpdateStopwatch;
+        else if (PhysicsUpdateStopwatches.TryGetValue(type, out Stopwatch physicsUpdateStopwatch)) return physicsUpdateStopwatch;
         return null;
     }
 

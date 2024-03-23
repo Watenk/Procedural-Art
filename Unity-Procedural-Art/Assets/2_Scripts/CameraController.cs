@@ -10,15 +10,15 @@ public class CameraController
     //-------------------------------------------------------------------
 
     public CameraController(){
-        EventManager.AddListener(Events.OnMousePosChange, MousePosChange);
-        EventManager.AddListener(Events.OnMiddleMouseDown, MiddleMouseDown);
-        EventManager.AddListener(Events.OnMiddleMouseUp, MiddleMouseUp);
+        EventManager.AddListener<Vector2>(Events.OnMousePosChange, MousePosChange);
+        EventManager.AddListener<Vector2Int>(Events.OnMiddleMouseDown, MiddleMouseDown);
+        EventManager.AddListener<Vector2Int>(Events.OnMiddleMouseUp, MiddleMouseUp);
         EventManager.AddListener<float>(Events.OnMouseScroll, MouseScroll);
     }
 
     //--------------------------------------------------------------------
 
-    private void MousePosChange(){
+    private void MousePosChange(Vector2 mousePos2){
         if (moveCam == true){
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
@@ -30,12 +30,12 @@ public class CameraController
         }
     }
 
-    private void MiddleMouseDown(){
+    private void MiddleMouseDown(Vector2Int mousePos){
         previousMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         moveCam = true;
     }
 
-    private void MiddleMouseUp(){
+    private void MiddleMouseUp(Vector2Int mousePos){
         moveCam = false;
     }
 

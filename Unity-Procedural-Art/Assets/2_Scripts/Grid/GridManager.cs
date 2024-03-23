@@ -17,7 +17,6 @@ public class GridManager
     public GridManager(){
 
         GridSize = Settings.Instance.GridSize;
-        EventManager.AddListener(Events.OnLeftMouseDown, OnLeftMouseDown);
 
         cells = new Cell[GridSize.x, GridSize.y];
         for (int y = 0; y < GridSize.y; y++){
@@ -52,14 +51,5 @@ public class GridManager
 
     public void ClearChangedCells(){
         changedCells.Clear();
-    }
-
-    //----------------------------------------
-
-    private void OnLeftMouseDown(){
-        Vector3 mousePos3 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2Int mousePos = new Vector2Int((int)mousePos3.x, -(int)mousePos3.y);
-
-        SetCell(mousePos, Cells.wood);
     }
 }

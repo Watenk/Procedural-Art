@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Cells
+public enum Directions 
 {
-    wood,
-    leave,
-    seed,
-    air,
-    dirt,
+    Up,
+    Left,
+    Down,
+    Right
 }

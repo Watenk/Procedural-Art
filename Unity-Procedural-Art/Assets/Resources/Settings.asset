@@ -13,13 +13,17 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: 
   MinCamSize: 1
-  MaxCamSize: 100
+  MaxCamSize: 500
   ScrollSpeed: 5
-  UPSTarget: 60
-  GridSize: {x: 1000, y: 200}
+  UPSTarget: 24
+  GridSize: {x: 100, y: 100}
   DesiredChunkSize: {x: 100, y: 100}
   Atlas: {fileID: 2100000, guid: a70c200ea6747aa40bdc4c73fe810097, type: 2}
   AtlasSize: {x: 160, y: 160}
   SpriteTextureSize: {x: 32, y: 32}
   UVFloatErrorMargin: {x: 0.00001, y: 0.00001}
   ProfilerUpdateSpeed: 0.1
+  GeneAmount: 30
+  InactiveGeneAmount: 15
+  GeneMutationChance: 20
+  ChromosomeMutationChance: 20

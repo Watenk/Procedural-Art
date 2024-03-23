@@ -7,7 +7,4 @@ public class UIManager
     private ProfilerUI profilerUI= new ProfilerUI();
 
     //-----------------------------------
-
-
-
 }

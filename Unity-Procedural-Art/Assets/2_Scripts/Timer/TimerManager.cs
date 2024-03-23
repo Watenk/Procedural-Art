@@ -4,7 +4,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
-public class TimerManager : IUpdateable
+public class TimerManager
 {
     private List<Timer> timers = new List<Timer>();
     private List<Stopwatch> stopwatches = new List<Stopwatch>();

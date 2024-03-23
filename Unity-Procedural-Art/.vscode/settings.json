@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Unity-Procedural-Animation.sln"
+    "dotnet.defaultSolution": "Unity-Procedural-Art.sln"
 }
