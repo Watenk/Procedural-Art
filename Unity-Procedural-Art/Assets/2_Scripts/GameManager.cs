@@ -31,10 +31,11 @@ public class GameManager : MonoBehaviour
         timerManager = AddService(new TimerManager());
         AddService(new Profiler());
 
-        AddService(new GridManager());
+        AddService(new CellGridManager());
         MapGenerator mapGenerator = new MapGenerator();
-        AddService(new GridRenderer());
+        AddService(new CellGridRenderer());
         AddService(new LightManager());
+        //AddService(new LightGridDebugger());
         AddService(new PlantManager());
 
         AddService(new InputHandler());

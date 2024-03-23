@@ -60,4 +60,7 @@ public class Settings : ScriptableObject
     public float GeneMutationChance;
     [Tooltip("Chance a certain chromosome (direction) mutates if a gene mutates")]
     public float ChromosomeMutationChance;
+
+    [Header("Prefabs")]
+    public GameObject LightGridDebugPrefab;
 }

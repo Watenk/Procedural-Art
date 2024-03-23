@@ -5,11 +5,11 @@ using Unity.Collections;
 using UnityEngine;
 using Watenk;
 
-public class GridRenderer : IUpdateable
+public class CellGridRenderer : IUpdateable
 {
     private MeshFilter[,] meshFilters;
-    private Dictionary<Cells, Vector2> atlasUV00 = new Dictionary<Cells, Vector2>();
-    private Dictionary<Cells, Vector2> atlasUV11 = new Dictionary<Cells, Vector2>();
+    private Dictionary<Cell, Vector2> atlasUV00 = new Dictionary<Cell, Vector2>();
+    private Dictionary<Cell, Vector2> atlasUV11 = new Dictionary<Cell, Vector2>();
 
     // Cache
     private List<Vector2Int>[,] changedCells;
@@ -18,15 +18,15 @@ public class GridRenderer : IUpdateable
     private Vector2Int gridSize;
 
     // Dependencies
-    private IGridDrawable changedCellsGrid;
-    private IGrid grid;
+    private ICellGridDrawable changedCellsGrid;
+    private ICellGrid cellGrid;
 
     //-----------------------------------------------
 
-    public GridRenderer(){
-        grid = GameManager.GetService<GridManager>();
-        changedCellsGrid = GameManager.GetService<GridManager>();
-        gridSize = grid.GridSize;
+    public CellGridRenderer(){
+        cellGrid = GameManager.GetService<CellGridManager>();
+        changedCellsGrid = GameManager.GetService<CellGridManager>();
+        gridSize = cellGrid.GridSize;
         chunkSize = Settings.Instance.DesiredChunkSize;
 
         if (gridSize.x < chunkSize.x) chunkSize.x = gridSize.x;
@@ -74,7 +74,7 @@ public class GridRenderer : IUpdateable
     //---------------------------------------------------------------
 
     private void InitAtlas(){
-        int cellsAmount = Enum.GetNames(typeof(Cells)).Length;
+        int cellsAmount = Enum.GetNames(typeof(Cell)).Length;
         int index = 0;
         for (int y = 0; y < Settings.Instance.AtlasSize.y; y += Settings.Instance.SpriteTextureSize.y){
             for (int x = 0; x < Settings.Instance.AtlasSize.x; x += Settings.Instance.SpriteTextureSize.x){
@@ -86,8 +86,8 @@ public class GridRenderer : IUpdateable
                 uv00 += Settings.Instance.UVFloatErrorMargin;
                 uv11 -= Settings.Instance.UVFloatErrorMargin;
 
-                atlasUV00.Add((Cells)index, uv00);
-                atlasUV11.Add((Cells)index, uv11);
+                atlasUV00.Add((Cell)index, uv00);
+                atlasUV11.Add((Cell)index, uv11);
 
                 index++; 
             }
@@ -135,7 +135,7 @@ public class GridRenderer : IUpdateable
             for (int x = 0; x < size.x; x++){
 
                 Vector2Int chunkOrgin = CalcChunkOrgin(chunkIndex);
-                Cell currentCell = grid.GetCell(new Vector2Int(chunkOrgin.x + x, chunkOrgin.y + y));
+                ref Cell currentCell = ref cellGrid.GetCell(new Vector2Int(chunkOrgin.x + x, chunkOrgin.y + y));
 
                 // Vertices
                 // This generates 4 vertices clockwise because a quad had 4 vertices
@@ -160,8 +160,8 @@ public class GridRenderer : IUpdateable
 
                 // UV
                 // UV's start rendering from the bottom left (UV00 is bottom left and UV11 is top right)
-                atlasUV00.TryGetValue(currentCell.Cells, out Vector2 uv00);
-                atlasUV11.TryGetValue(currentCell.Cells, out Vector2 uv11);
+                atlasUV00.TryGetValue(currentCell, out Vector2 uv00);
+                atlasUV11.TryGetValue(currentCell, out Vector2 uv11);
                 uv[verticeIndex + 0] = new Vector2(uv00.x, uv00.y);
                 uv[verticeIndex + 1] = new Vector2(uv11.x, uv00.y);
                 uv[verticeIndex + 2] = new Vector2(uv00.x, uv11.y);
@@ -186,13 +186,13 @@ public class GridRenderer : IUpdateable
         foreach (Vector2Int currentCellPos in changedCellsInChunk){
 
             Vector2Int chunkOrgin = CalcChunkOrgin(chunkIndex);
-            Cell currentCell = grid.GetCell(currentCellPos);
+            ref Cell currentCell = ref cellGrid.GetCell(currentCellPos);
             int index = (currentCellPos.x - chunkOrgin.x) + (currentCellPos.y - chunkOrgin.y) * chunkSize.y;
             int verticeIndex = 4 * index;
 
             // UV
-            atlasUV00.TryGetValue(currentCell.Cells, out Vector2 uv00);
-            atlasUV11.TryGetValue(currentCell.Cells, out Vector2 uv11);
+            atlasUV00.TryGetValue(currentCell, out Vector2 uv00);
+            atlasUV11.TryGetValue(currentCell, out Vector2 uv11);
             uv[verticeIndex + 0] = new Vector2(uv00.x, uv00.y);
             uv[verticeIndex + 1] = new Vector2(uv11.x, uv00.y);
             uv[verticeIndex + 2] = new Vector2(uv00.x, uv11.y);

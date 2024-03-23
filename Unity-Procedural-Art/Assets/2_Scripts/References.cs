@@ -23,4 +23,6 @@ public class References : MonoBehaviour
 
     public Text ProfilerText { get { return profilerText; } }
     [SerializeField] private Text profilerText;
+    public GameObject Canvas { get { return canvas; } }
+    [SerializeField] private GameObject canvas;
 }

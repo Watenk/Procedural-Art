@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridDebugger : IUpdateable
+public enum Cell
 {
-    public void OnUpdate(){
-
-    }
+    wood,
+    leave,
+    seed,
+    air,
+    dirt,
 }

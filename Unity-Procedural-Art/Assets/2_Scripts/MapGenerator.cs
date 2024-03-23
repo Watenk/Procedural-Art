@@ -5,17 +5,17 @@ using UnityEngine;
 public class MapGenerator
 {
     // Dependencies
-    private IGrid grid;
+    private ICellGrid grid;
 
     //--------------------------------------
 
     public MapGenerator(){
-        grid = GameManager.GetService<GridManager>();
+        grid = GameManager.GetService<CellGridManager>();
 
         for (int y = grid.GridSize.y - 5; y < grid.GridSize.y; y++){
             for(int x = 0; x < grid.GridSize.x; x++){
-                Cell currentCell = grid.GetCell(new Vector2Int(x, y));
-                currentCell.Cells = Cells.dirt;
+                ref Cell currentCell = ref grid.GetCell(new Vector2Int(x, y));
+                currentCell = Cell.dirt;
             }
         }
     }

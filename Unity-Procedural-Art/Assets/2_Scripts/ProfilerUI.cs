@@ -36,21 +36,21 @@ public class ProfilerUI
         debugTextString += "\n";
 
         // Updates
-        debugTextString += "Update: " + MathUtility.SetDecimals(profiler.UpdateTime, 2) + "ms" + "\n";
+        debugTextString += "Update: " + MathUtility.SetDecimals(profiler.UpdateTime, 1) + "ms" + "\n";
         foreach (KeyValuePair<Type, Stopwatch> kvp in profiler.UpdateStopwatches){
-            debugTextString += "   -" + kvp.Key + ": " + MathUtility.SetDecimals(kvp.Value.Time * 1000, 2) + "ms" + "\n";
+            debugTextString += "   -" + kvp.Key + ": " + MathUtility.SetDecimals(kvp.Value.Time * 1000, 1) + "ms" + "\n";
         }
         debugTextString += "\n";
 
         // Physics Updates
-        debugTextString += "PhysicsUpdate: " + MathUtility.SetDecimals(profiler.PhysicsUpdateTime, 2) + "ms" + "\n";
+        debugTextString += "PhysicsUpdate: " + MathUtility.SetDecimals(profiler.PhysicsUpdateTime, 1) + "ms" + "\n";
         foreach (KeyValuePair<Type, Stopwatch> kvp in profiler.PhysicsUpdateStopwatches){
-            debugTextString += "   -" + kvp.Key + ": " + MathUtility.SetDecimals(kvp.Value.Time * 1000, 2) + "ms" + "\n";
+            debugTextString += "   -" + kvp.Key + ": " + MathUtility.SetDecimals(kvp.Value.Time * 1000, 1) + "ms" + "\n";
         }
         debugTextString += "\n";
 
         // Remaining time
-        debugTextString += "Remaining: " + MathUtility.SetDecimals(profiler.RemainingTime, 2) + "ms" + "\n";
+        debugTextString += "Remaining: " + MathUtility.SetDecimals(profiler.RemainingTime, 1) + "ms" + "\n";
         debugTextString += "\n";
 
         profilerText.text = debugTextString;

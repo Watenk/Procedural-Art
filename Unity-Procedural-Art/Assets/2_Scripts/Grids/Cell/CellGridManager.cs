@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Watenk;
 
-public class GridManager : IGrid, IGridDrawable
+public class CellGridManager : ICellGrid, ICellGridDrawable
 {
     public Vector2Int GridSize { get; private set; }
     
@@ -14,23 +14,19 @@ public class GridManager : IGrid, IGridDrawable
 
     //-------------------------------------------
 
-    public GridManager(){
+    public CellGridManager(){
 
         GridSize = Settings.Instance.GridSize;
 
         cells = new Cell[GridSize.x, GridSize.y];
         for (int y = 0; y < GridSize.y; y++){
             for(int x = 0; x < GridSize.x; x++){
-                Cell newCell = new Cell(new Vector2Int(x, y), this);
-                newCell.Cells = Cells.air;
-                cells[x, y] = newCell;
+                cells[x, y] = Cell.air;
             }
         }
     }
 
     public ref Cell GetCell(Vector2Int pos){
-        if (!IsInBounds(pos)) Debug.Log("Tried to get Cell out of bounds");
-
         return ref cells[pos.x, pos.y];
     }
 
