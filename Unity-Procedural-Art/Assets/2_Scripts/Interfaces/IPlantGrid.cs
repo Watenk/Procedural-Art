@@ -4,10 +4,10 @@ using UnityEngine;
 
 public interface IPlantGrid 
 {
-    public Vector2Int GridSize { get; }
+    public Vector2Short GridSize { get; }
 
     //-------------------------------
     
-    public ref Plant GetCell(Vector2Int pos);
-    public bool IsInBounds(Vector2Int pos);
+    public PlantCell GetCell(Vector2Short pos);
+    public bool IsInBounds(Vector2Short pos);
 }

@@ -35,14 +35,16 @@ public class GameManager : MonoBehaviour
         MapGenerator mapGenerator = new MapGenerator();
         AddService(new CellGridRenderer());
         AddService(new LightManager());
-        //AddService(new LightGridDebugger());
         AddService(new PlantManager());
-        AddService(new PlantGridDebugger());
 
         AddService(new InputHandler());
         AddService(new CameraController());
 
         AddService(new UIManager());
+
+        // Debuggers
+        //AddService(new LightGridDebugger());
+        AddService(new PlantGridDebugger());
 
         EventManager.Invoke(Events.OnProfilerInit, services);
 

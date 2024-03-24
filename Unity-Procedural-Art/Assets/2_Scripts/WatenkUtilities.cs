@@ -1,9 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Watenk;
 
 namespace Watenk{
 public static class GridUtility{
+
+    public static bool IsInBounds(Vector2Short pos, Vector2Short boundPos1, Vector2Short boundPos2){
+        if (pos.x < boundPos1.x || pos.x >= boundPos2.x) { return false; }
+        if (pos.y < boundPos1.y || pos.y >= boundPos2.y) { return false; }
+        return true;
+    }
+
     public static bool IsInBounds(Vector2Int pos, Vector2Int boundPos1, Vector2Int boundPos2){
         if (pos.x < boundPos1.x || pos.x >= boundPos2.x) { return false; }
         if (pos.y < boundPos1.y || pos.y >= boundPos2.y) { return false; }
@@ -130,4 +139,75 @@ public static class ColorUtility{
         return new Vector3(h * 360f, s * 100f, l * 100f);
     }
 }
+}
+
+[Serializable]
+public class Vector2Short 
+{
+    public static readonly Vector2Short Zero = new Vector2Short(0, 0);
+    public static readonly Vector2Short One = new Vector2Short(1, 1);
+    public static readonly Vector2Short Up = new Vector2Short(0, 1);
+    public static readonly Vector2Short Down = new Vector2Short(0, -1);
+    public static readonly Vector2Short Left = new Vector2Short(-1, 0);
+    public static readonly Vector2Short Right = new Vector2Short(1, 0);
+
+    public short x;
+    public short y;
+
+    //------------------------------------------
+
+    public Vector2Short(){
+        x = 0;
+        y = 0;
+    }
+
+    public Vector2Short(short x, short y){
+        this.x = x;
+        this.y = y;
+    }
+
+    public Vector2Short(int x, int y){
+        if (x < (int)short.MinValue || x >= (int)short.MaxValue) Debug.LogWarning("Int " + x + " is out of short range");
+        if (y < (int)short.MinValue || y >= (int)short.MaxValue) Debug.LogWarning("Int " + y + " is out of short range");
+        this.x = (short)x;
+        this.y = (short)y;
+    }
+
+    public Vector2Short(float x, float y){
+        if (x < (float)short.MinValue || x >= (float)short.MaxValue) Debug.LogWarning("Float " + x + " is out of short range");
+        if (y < (float)short.MinValue || y >= (float)short.MaxValue) Debug.LogWarning("Float " + y + " is out of short range");
+        this.x = (short)x;
+        this.y = (short)y;
+    }
+
+    public Vector2Short(Vector2Int vector2Int){
+        if (vector2Int.x < (int)short.MinValue || vector2Int.x >= (int)short.MaxValue) Debug.LogWarning("Int " + x + " is out of short range");
+        if (vector2Int.y < (int)short.MinValue || vector2Int.y >= (int)short.MaxValue) Debug.LogWarning("Int " + y + " is out of short range");
+        this.x = (short)vector2Int.x;
+        this.y = (short)vector2Int.y;
+    }
+
+    public override string ToString(){
+        return string.Format("{0}, {1}", x, y);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType()) return false;
+        
+
+        Vector2Short other = (Vector2Short)obj;
+        return x.Equals(other.x) && y.Equals(other.y);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 17;
+            hash = hash * 23 + x.GetHashCode();
+            hash = hash * 23 + y.GetHashCode();
+            return hash;
+        }
+    }
 }

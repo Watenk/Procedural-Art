@@ -17,17 +17,18 @@ MonoBehaviour:
   ScrollSpeed: 5
   UPSTarget: 24
   GridSize: {x: 10, y: 10}
-  DesiredChunkSize: {x: 100, y: 100}
+  DesiredChunkSize:
+    x: 100
+    y: 100
   Atlas: {fileID: 2100000, guid: a70c200ea6747aa40bdc4c73fe810097, type: 2}
   AtlasSize: {x: 160, y: 160}
   SpriteTextureSize: {x: 32, y: 32}
   UVFloatErrorMargin: {x: 0.00001, y: 0.00001}
   ProfilerUpdateSpeed: 0.1
-  MinLight: 5
-  MaxLight: 4
+  MinLight: 4
+  MaxLight: 6
   GeneAmount: 30
-  InactiveGeneAmount: 25
-  GeneMutationChance: 20
+  InactiveChromosomeAmount: 15
   ChromosomeMutationChance: 20
   LightGridDebugPrefab: {fileID: 497148073451968215, guid: 020e59e031a578c49b2e485351b4df0a, type: 3}
   PlantGridDebugPrefab: {fileID: 5303346518441015767, guid: c3209429c86b38940ba9639835d567af, type: 3}

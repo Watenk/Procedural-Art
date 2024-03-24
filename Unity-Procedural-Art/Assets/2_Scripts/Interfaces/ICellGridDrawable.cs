@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface ICellGridDrawable
 {
-    public List<Vector2Int> GetChangedCells();
-    public void AddChangedCell(Vector2Int pos);
+    public ref List<Vector2Short> GetChangedCells();
+    public void AddChangedCell(Vector2Short pos);
     public void ClearChangedCells();
 }

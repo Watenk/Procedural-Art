@@ -44,14 +44,15 @@ public class PlantGridDebugger : IPhysicsUpdateable
     public void OnPhysicsUpdate(){
         for (int y = 0; y < plantGrid.GridSize.y; y++){
             for(int x = 0; x < plantGrid.GridSize.x; x++){
-                ref Plant plant = ref plantGrid.GetCell(new Vector2Int(x, y));
-                if (plant == null) return;
+
+                PlantCell plant = plantGrid.GetCell(new Vector2Short(x, y));
+                if (plant == null) continue;
                 
-                mainDebugTexts[x, y].text = plant.Gene.ThisGene.ToString();
-                upDebugTexts[x, y].text = plant.Gene.GetChromosome(Vector2Int.up).ToString();
-                leftDebugTexts[x, y].text = plant.Gene.GetChromosome(Vector2Int.left).ToString();
-                downDebugTexts[x, y].text = plant.Gene.GetChromosome(Vector2Int.down).ToString();
-                rightDebugTexts[x, y].text = plant.Gene.GetChromosome(Vector2Int.right).ToString();
+                mainDebugTexts[x, y].text = plant.Gene.ToString();
+                upDebugTexts[x, y].text = plant.Genome.GetChromosome(plant.Gene).GetGene(Vector2Short.Up).ToString();
+                leftDebugTexts[x, y].text = plant.Genome.GetChromosome(plant.Gene).GetGene(Vector2Short.Left).ToString();;
+                downDebugTexts[x, y].text = plant.Genome.GetChromosome(plant.Gene).GetGene(Vector2Short.Down).ToString();;
+                rightDebugTexts[x, y].text = plant.Genome.GetChromosome(plant.Gene).GetGene(Vector2Short.Right).ToString();;
             }
         }
     }

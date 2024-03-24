@@ -5,12 +5,12 @@ using Watenk;
 
 public class CellGridManager : ICellGrid, ICellGridDrawable
 {
-    public Vector2Int GridSize { get; private set; }
+    public Vector2Short GridSize { get; private set; }
     
     private Cell[,] cells;
 
     // Grid Rendering
-    private List<Vector2Int> changedCells = new List<Vector2Int>();
+    private List<Vector2Short> changedCells = new List<Vector2Short>();
 
     //-------------------------------------------
 
@@ -26,25 +26,25 @@ public class CellGridManager : ICellGrid, ICellGridDrawable
         }
     }
 
-    public ref Cell GetCell(Vector2Int pos){
+    public ref Cell GetCell(Vector2Short pos){
         return ref cells[pos.x, pos.y];
     }
 
-    public bool IsInBounds(Vector2Int pos){
-        if (GridUtility.IsInBounds(pos, Vector2Int.zero, GridSize)) return true;
+    public bool IsInBounds(Vector2Short pos){
+        if (GridUtility.IsInBounds(pos, Vector2Short.Zero, GridSize)) return true;
         else return false;
     }
 
     // Changed Cells
-    public List<Vector2Int> GetChangedCells(){
-        return changedCells;
+    public ref List<Vector2Short> GetChangedCells(){
+        return ref changedCells;
     }
 
     public void ClearChangedCells(){
         changedCells.Clear();
     }
 
-    public void AddChangedCell(Vector2Int pos){
+    public void AddChangedCell(Vector2Short pos){
         changedCells.Add(pos);
     }
 }

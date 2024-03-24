@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
@@ -7,13 +8,13 @@ using Watenk;
 public class PlantManager : IPhysicsUpdateable, IPlantGrid
 {
     // Settings: Gravity, Atmosphere, Light, wind, radiation, Temperature
-    public Vector2Int GridSize { get; private set; }
+    public Vector2Short GridSize { get; private set; }
 
-    private Plant[,] plants;
-    private List<Vector2Int> updatedPlants = new List<Vector2Int>();
+    private Dictionary<Vector2Short, PlantCell> growingPlants;
+    private Dictionary<Vector2Short, PlantCell> livingPlants;
+    private Dictionary<Vector2Short, PlantCell> deadPlants;
 
-    // Cache
-    private int geneAmount;
+    private byte geneAmount;
 
     // Dependencies
     private ICellGrid cellGrid;
@@ -29,73 +30,88 @@ public class PlantManager : IPhysicsUpdateable, IPlantGrid
         GridSize = cellGrid.GridSize;
         geneAmount = Settings.Instance.GeneAmount;
 
-        plants = new Plant[GridSize.x, GridSize.y];
+        growingPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
+        livingPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
+        deadPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
 
         EventManager.AddListener<Vector2Int>(Events.OnLeftMouseDown, OnLeftMouseDown);
     }
 
     public void OnPhysicsUpdate(){
-        for (int y = 0; y < cellGrid.GridSize.y; y++){
-            for(int x = 0; x < cellGrid.GridSize.x; x++){
-                Vector2Int currentPos = new Vector2Int(x, y);
-                ref Plant plant = ref plants[x, y];
-                if (plant != null){
-                    TryGrowInDirection(currentPos, Vector2Int.up);
-                    TryGrowInDirection(currentPos, Vector2Int.left);
-                    TryGrowInDirection(currentPos, Vector2Int.down);
-                    TryGrowInDirection(currentPos, Vector2Int.right);
-                }
-            }
+
+        foreach (var current in growingPlants){
+            // if (TryGrow(current.Value)){
+            //     //livingPlants.Add(current.Value);
+            // }
         }
-        updatedPlants.Clear();
+
+        // // Garbage Collection
+        // foreach (var current in GCGrowingPlants) growingPlants.Remove(current);
+        // GCGrowingPlants.Clear();
+
+        // for (int y = 0; y < cellGrid.GridSize.y; y++){
+        //     for(int x = 0; x < cellGrid.GridSize.x; x++){
+        //         Vector2Int currentPos = new Vector2Int(x, y);
+        //         ref Plant currentGrowingPlant = ref growingPlants[x, y];
+        //         if (currentGrowingPlant == null) continue;
+
+        //         TryGrow(currentGrowingPlant, currentPos);
+        //     }
+        // }
     }
 
-    public void AddPlant(Vector2Int pos){
+    public void AddPlant(Vector2Short pos){
         Genome genome = new Genome(geneAmount);
         ref Cell currentCell = ref cellGrid.GetCell(pos);
         
         currentCell = Cell.leave;
-        plants[pos.x, pos.y] = new Plant(genome.GetGene(0), genome);
+        growingPlants.Add(pos, new PlantCell(0, genome));
         cellGridDrawable.AddChangedCell(pos);
     }
 
-    public ref Plant GetCell(Vector2Int pos){
-        return ref plants[pos.x, pos.y];
+    public PlantCell GetCell(Vector2Short pos){
+        if (!growingPlants.ContainsKey(pos)) return null;
+
+        return growingPlants[pos];
     }
 
-    public bool IsInBounds(Vector2Int pos){
-        if (GridUtility.IsInBounds(pos, Vector2Int.zero, GridSize)) return true;
+    public bool IsInBounds(Vector2Short pos){
+        if (GridUtility.IsInBounds(pos, Vector2Short.Zero, GridSize)) return true;
         else return false;
     }
 
     //--------------------------------------------------
 
     private void OnLeftMouseDown(Vector2Int mousePos){
-        AddPlant(mousePos);
+        AddPlant(new Vector2Short(mousePos));
     }
 
-    private void TryGrowInDirection(Vector2Int parentPos, Vector2Int direction){
+    //private bool TryGrow(Plant plant){
+
+    //}
+
+    // private void TryGrowInDirection(Vector2Int parentPos, Vector2Int direction){
         
-        if (updatedPlants.Contains(parentPos)) return;
+    //     if (updatedPlants.Contains(parentPos)) return;
 
-        // Chromosome Parent
-        ref Plant parentPlant = ref plants[parentPos.x, parentPos.y];
-        int chromosome = parentPlant.Gene.GetChromosome(direction);
-        if (chromosome == -1) return; // If is Inactive
+    //     // Chromosome Parent
+    //     ref Plant parentPlant = ref plants[parentPos.x, parentPos.y];
+    //     byte chromosome = parentPlant.Gene.GetChromosome(direction);
+    //     //if (chromosome == -1) return; // If is Inactive
 
-        // Target Plant
-        Vector2Int targetPos = parentPos + new Vector2Int(direction.x, -direction.y);
-        if (!IsInBounds(targetPos)) return;
-        ref Cell targetCell = ref cellGrid.GetCell(targetPos);
-        if (targetCell != Cell.air) return;
+    //     // Target Plant
+    //     Vector2Int targetPos = parentPos + new Vector2Int(direction.x, -direction.y);
+    //     if (!IsInBounds(targetPos)) return;
+    //     ref Cell targetCell = ref cellGrid.GetCell(targetPos);
+    //     if (targetCell != Cell.air) return;
 
-        // Light
-        ref byte lightLevel = ref lightGrid.GetCell(targetPos);
-        if (lightLevel == 0) return;
+    //     // Light
+    //     ref byte lightLevel = ref lightGrid.GetCell(targetPos);
+    //     if (lightLevel == 0) return;
 
-        targetCell = Cell.leave;
-        plants[targetPos.x, targetPos.y] = new Plant(parentPlant.Genome.GetGene(chromosome), parentPlant.Genome);
-        cellGridDrawable.AddChangedCell(targetPos);
-        updatedPlants.Add(targetPos);
-    }
+    //     targetCell = Cell.leave;
+    //     plants[targetPos.x, targetPos.y] = new Plant(parentPlant.Genome.GetChromosome(chromosome), parentPlant.Genome);
+    //     cellGridDrawable.AddChangedCell(targetPos);
+    //     updatedPlants.Add(targetPos);
+    // }
 }

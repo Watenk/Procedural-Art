@@ -30,10 +30,10 @@ public class Settings : ScriptableObject
     public float UPSTarget;
 
     [Header("Grid")]
-    public Vector2Int GridSize;
+    public Vector2Short GridSize;
 
     [Header("GridRendering")]
-    public Vector2Int DesiredChunkSize;
+    public Vector2Short DesiredChunkSize;
     public Material Atlas;
     [Tooltip("Size of atlas texture in pixels")]
     public Vector2Int AtlasSize;
@@ -53,13 +53,12 @@ public class Settings : ScriptableObject
 
     [Header("Plants")]
     [Tooltip("How many genes 1 plant has")]
-    public int GeneAmount;
+    public byte GeneAmount;
     [Tooltip("How many inactive genes 1 plant has (Amount of genes that will not grow in a genome)")]
-    public int InactiveGeneAmount;
+    public byte InactiveChromosomeAmount;
     [Tooltip("Chance a seed gene mutates")]
-    public float GeneMutationChance;
-    [Tooltip("Chance a certain chromosome (direction) mutates if a gene mutates")]
     public float ChromosomeMutationChance;
+    [Tooltip("Chance a certain chromosome (direction) mutates if a gene mutates")]
 
     [Header("Prefabs")]
     public GameObject LightGridDebugPrefab;

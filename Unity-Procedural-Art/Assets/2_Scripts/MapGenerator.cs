@@ -14,7 +14,7 @@ public class MapGenerator
 
         for (int y = grid.GridSize.y - 5; y < grid.GridSize.y; y++){
             for(int x = 0; x < grid.GridSize.x; x++){
-                ref Cell currentCell = ref grid.GetCell(new Vector2Int(x, y));
+                ref Cell currentCell = ref grid.GetCell(new Vector2Short(x, y));
                 currentCell = Cell.dirt;
             }
         }

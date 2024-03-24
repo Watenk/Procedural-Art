@@ -12,30 +12,30 @@ public class CellGridRenderer : IUpdateable
     private Dictionary<Cell, Vector2> atlasUV11 = new Dictionary<Cell, Vector2>();
 
     // Cache
-    private List<Vector2Int>[,] changedCells;
-    private Vector2Int chunkSize;
-    private Vector2Int chunksAmount;
-    private Vector2Int gridSize;
+    private List<Vector2Short>[,] changedCells;
+    private Vector2Short chunkSize;
+    private Vector2Short chunksAmount;
+    private Vector2Short gridSize;
 
     // Dependencies
-    private ICellGridDrawable changedCellsGrid;
+    private ICellGridDrawable cellGridDrawable;
     private ICellGrid cellGrid;
 
     //-----------------------------------------------
 
     public CellGridRenderer(){
         cellGrid = GameManager.GetService<CellGridManager>();
-        changedCellsGrid = GameManager.GetService<CellGridManager>();
+        cellGridDrawable = GameManager.GetService<CellGridManager>();
         gridSize = cellGrid.GridSize;
         chunkSize = Settings.Instance.DesiredChunkSize;
 
-        if (gridSize.x < chunkSize.x) chunkSize.x = gridSize.x;
-        if (gridSize.y < chunkSize.y) chunkSize.y = gridSize.y;
-        chunksAmount = new Vector2Int(Mathf.CeilToInt((float)gridSize.x / (float)chunkSize.x), Mathf.CeilToInt((float)gridSize.y / (float)chunkSize.y));
-        changedCells = new List<Vector2Int>[chunksAmount.x ,chunksAmount.y];
+        if (gridSize.x < chunkSize.x) chunkSize.x = (short)gridSize.x;
+        if (gridSize.y < chunkSize.y) chunkSize.y = (short)gridSize.y;
+        chunksAmount = new Vector2Short(Mathf.CeilToInt((float)gridSize.x / (float)chunkSize.x), Mathf.CeilToInt((float)gridSize.y / (float)chunkSize.y));
+        changedCells = new List<Vector2Short>[chunksAmount.x ,chunksAmount.y];
         for (int y = 0; y < chunksAmount.y; y++){
             for (int x = 0; x < chunksAmount.x; x++){
-                changedCells[x, y] = new List<Vector2Int>();
+                changedCells[x, y] = new List<Vector2Short>();
             }
         }
 
@@ -52,23 +52,23 @@ public class CellGridRenderer : IUpdateable
         //     }
         // }
 
-        List<Vector2Int> gridChangedCells = changedCellsGrid.GetChangedCells();
+        ref List<Vector2Short> gridChangedCells = ref cellGridDrawable.GetChangedCells();
 
         // Sort changed Cells
-        foreach (Vector2Int current in gridChangedCells){
+        foreach (Vector2Short current in gridChangedCells){
             
-            Vector2Int chunkIndex = PosToChunkIndex(current);
+            Vector2Short chunkIndex = PosToChunkIndex(current);
             changedCells[chunkIndex.x, chunkIndex.y].Add(current);
         }
 
         for (int y = 0; y < chunksAmount.y; y++){
             for (int x = 0; x < chunksAmount.x; x++){
-                UpdateMesh(changedCells[x, y], meshFilters[x, y] , new Vector2Int(x, y));
+                UpdateMesh(changedCells[x, y], meshFilters[x, y] , new Vector2Short(x, y));
                 changedCells[x, y].Clear();
             }
         }
 
-        changedCellsGrid.ClearChangedCells();
+        cellGridDrawable.ClearChangedCells();
     }
 
     //---------------------------------------------------------------
@@ -80,8 +80,8 @@ public class CellGridRenderer : IUpdateable
             for (int x = 0; x < Settings.Instance.AtlasSize.x; x += Settings.Instance.SpriteTextureSize.x){
                 if (index >= cellsAmount) { break; }
                 
-                Vector2 uv00 = AtlasPosToUV00(new Vector2Int(x, y));
-                Vector2 uv11 = AtlasPosToUV11(new Vector2Int(x, y));
+                Vector2 uv00 = AtlasPosToUV00(new Vector2Short(x, y));
+                Vector2 uv11 = AtlasPosToUV11(new Vector2Short(x, y));
 
                 uv00 += Settings.Instance.UVFloatErrorMargin;
                 uv11 -= Settings.Instance.UVFloatErrorMargin;
@@ -114,12 +114,12 @@ public class CellGridRenderer : IUpdateable
         // Generate Meshes
         for (int y = 0; y < chunksAmount.y; y++){
             for (int x = 0; x < chunksAmount.x; x++){
-                GenerateMesh(meshFilters[x, y], chunkSize, new Vector2Int(x, y));
+                GenerateMesh(meshFilters[x, y], chunkSize, new Vector2Short(x, y));
             }
         }
     }
 
-    private void GenerateMesh(MeshFilter meshFilter, Vector2Int size, Vector2Int chunkIndex){
+    private void GenerateMesh(MeshFilter meshFilter, Vector2Short size, Vector2Short chunkIndex){
         
         Mesh mesh = new Mesh();
 
@@ -134,8 +134,8 @@ public class CellGridRenderer : IUpdateable
         for (int y = 0; y < size.y; y++){
             for (int x = 0; x < size.x; x++){
 
-                Vector2Int chunkOrgin = CalcChunkOrgin(chunkIndex);
-                ref Cell currentCell = ref cellGrid.GetCell(new Vector2Int(chunkOrgin.x + x, chunkOrgin.y + y));
+                Vector2Short chunkOrgin = CalcChunkOrgin(chunkIndex);
+                ref Cell currentCell = ref cellGrid.GetCell(new Vector2Short(chunkOrgin.x + x, chunkOrgin.y + y));
 
                 // Vertices
                 // This generates 4 vertices clockwise because a quad had 4 vertices
@@ -178,14 +178,14 @@ public class CellGridRenderer : IUpdateable
         meshFilter.mesh = mesh;
     }
 
-    private void UpdateMesh(List<Vector2Int> changedCellsInChunk, MeshFilter meshFilter, Vector2Int chunkIndex){
+    private void UpdateMesh(List<Vector2Short> changedCellsInChunk, MeshFilter meshFilter, Vector2Short chunkIndex){
 
         if (changedCellsInChunk.Count == 0) return;
         Vector2[] uv = meshFilter.mesh.uv;
 
-        foreach (Vector2Int currentCellPos in changedCellsInChunk){
+        foreach (Vector2Short currentCellPos in changedCellsInChunk){
 
-            Vector2Int chunkOrgin = CalcChunkOrgin(chunkIndex);
+            Vector2Short chunkOrgin = CalcChunkOrgin(chunkIndex);
             ref Cell currentCell = ref cellGrid.GetCell(currentCellPos);
             int index = (currentCellPos.x - chunkOrgin.x) + (currentCellPos.y - chunkOrgin.y) * chunkSize.y;
             int verticeIndex = 4 * index;
@@ -201,25 +201,23 @@ public class CellGridRenderer : IUpdateable
         meshFilter.mesh.uv = uv;
     }
 
-    private Vector2 AtlasPosToUV00(Vector2Int pos){
+    private Vector2 AtlasPosToUV00(Vector2Short pos){
         float xUV = MathUtility.Map(pos.x, 0, Settings.Instance.AtlasSize.x, 0, 1);
         float yUV = MathUtility.Map(pos.y + Settings.Instance.SpriteTextureSize.y, 0, Settings.Instance.AtlasSize.y, 1, 0);
         return new Vector2(xUV, yUV);
     }
 
-    private Vector2 AtlasPosToUV11(Vector2Int pos){
+    private Vector2 AtlasPosToUV11(Vector2Short pos){
         float xUV = MathUtility.Map(pos.x + Settings.Instance.SpriteTextureSize.x, 0, Settings.Instance.AtlasSize.x, 0, 1);
         float yUV = MathUtility.Map(pos.y, 0, Settings.Instance.AtlasSize.y, 1, 0);
         return new Vector2(xUV, yUV);
     }
 
-    private Vector2Int CalcChunkOrgin(Vector2Int chunkIndex){
-        return new Vector2Int(chunkIndex.x * chunkSize.x, chunkIndex.y * chunkSize.y);
+    private Vector2Short CalcChunkOrgin(Vector2Short chunkIndex){
+        return new Vector2Short(chunkIndex.x * chunkSize.x, chunkIndex.y * chunkSize.y);
     }
 
-    private Vector2Int PosToChunkIndex(Vector2Int pos){
-        int xIndex = pos.x / chunkSize.x;
-        int yIndex = pos.y / chunkSize.y;
-        return new Vector2Int(xIndex, yIndex);
+    private Vector2Short PosToChunkIndex(Vector2Short pos){
+        return new Vector2Short(pos.x / chunkSize.x, pos.y / chunkSize.y);
     }
 }

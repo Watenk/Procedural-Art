@@ -31,7 +31,7 @@ public class LightGridDebugger : IPhysicsUpdateable
     public void OnPhysicsUpdate(){
         for (int y = 0; y < lightGrid.GridSize.y; y++){
             for(int x = 0; x < lightGrid.GridSize.x; x++){
-                ref byte lightLevel = ref lightGrid.GetCell(new Vector2Int(x, y));
+                ref byte lightLevel = ref lightGrid.GetCell(new Vector2Short(x, y));
                 debugTexts[x, y].text = lightLevel.ToString();
             }
         }
