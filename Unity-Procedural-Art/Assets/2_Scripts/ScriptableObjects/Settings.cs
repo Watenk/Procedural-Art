@@ -63,4 +63,5 @@ public class Settings : ScriptableObject
 
     [Header("Prefabs")]
     public GameObject LightGridDebugPrefab;
+    public GameObject PlantGridDebugPrefab;
 }

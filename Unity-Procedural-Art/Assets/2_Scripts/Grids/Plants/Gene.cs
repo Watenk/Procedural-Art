@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class Gene
 {
-    public int GeneIndex { get; private set; }
+    public int ThisGene { get; private set; }
     private Dictionary<Vector2Int, int> chromosomes = new Dictionary<Vector2Int, int>();
 
     //---------------------------
 
     public Gene(int geneIndex){
-        GeneIndex = geneIndex;
+        ThisGene = geneIndex;
     }
 
     public void AddChromosome(Vector2Int direction, int gene){
