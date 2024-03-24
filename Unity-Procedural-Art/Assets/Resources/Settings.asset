@@ -26,7 +26,7 @@ MonoBehaviour:
   MinLight: 5
   MaxLight: 4
   GeneAmount: 30
-  InactiveGeneAmount: 15
+  InactiveGeneAmount: 25
   GeneMutationChance: 20
   ChromosomeMutationChance: 20
   LightGridDebugPrefab: {fileID: 497148073451968215, guid: 020e59e031a578c49b2e485351b4df0a, type: 3}
