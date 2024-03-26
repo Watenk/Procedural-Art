@@ -48,11 +48,11 @@ public class PlantGeneGridDebugger : IPhysicsUpdateable
                 PlantCell plant = plantGrid.GetCell(new Vector2Short(x, y));
                 if (plant == null) continue;
                 
-                mainDebugTexts[x, y].text = plant.Gene.ToString();
-                upDebugTexts[x, y].text = plant.Genome.GetChromosome(plant.Gene).GetGene(Vector2Short.Up).ToString();
-                leftDebugTexts[x, y].text = plant.Genome.GetChromosome(plant.Gene).GetGene(Vector2Short.Left).ToString();;
-                downDebugTexts[x, y].text = plant.Genome.GetChromosome(plant.Gene).GetGene(Vector2Short.Down).ToString();;
-                rightDebugTexts[x, y].text = plant.Genome.GetChromosome(plant.Gene).GetGene(Vector2Short.Right).ToString();;
+                mainDebugTexts[x, y].text = plant.ThisGene.ToString();
+                upDebugTexts[x, y].text = plant.Genome.GetDirectionChromosome(plant.ThisGene).GetGene(Vector2Short.Up).ToString();
+                leftDebugTexts[x, y].text = plant.Genome.GetDirectionChromosome(plant.ThisGene).GetGene(Vector2Short.Left).ToString();;
+                downDebugTexts[x, y].text = plant.Genome.GetDirectionChromosome(plant.ThisGene).GetGene(Vector2Short.Down).ToString();;
+                rightDebugTexts[x, y].text = plant.Genome.GetDirectionChromosome(plant.ThisGene).GetGene(Vector2Short.Right).ToString();;
             }
         }
     }

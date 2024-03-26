@@ -59,8 +59,8 @@ public class LightManager : IPhysicsUpdateable, ILightGrid
                 
                 ref byte upLightLevel = ref lightLevels[x, y - 1];
                 if (upLightLevel != 0){
-                    ref Cell cell = ref cellGrid.GetCell(new Vector2Short(x, y));
-                    if (cell != Cell.air){
+                    ref Cell upCell = ref cellGrid.GetCell(new Vector2Short(x, y - 1));
+                    if (upCell != Cell.air){
                         lightLevels[x, y] = (byte)(upLightLevel - 1);
                     }
                     else{

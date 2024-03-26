@@ -8,7 +8,7 @@ public class Genome
     public byte ChromosomeAmount { get; private set; }
     public byte InactiveChromosomeAmount { get; private set; }
 
-    private Chromosome[] chromosomes;
+    private DirectionChromosome[] chromosomes;
 
     // Cache
     private float chromosomeMutationChance;
@@ -20,20 +20,20 @@ public class Genome
         chromosomeMutationChance = Settings.Instance.ChromosomeMutationChance;
         InactiveChromosomeAmount = Settings.Instance.InactiveChromosomeAmount;
 
-        chromosomes = new Chromosome[ChromosomeAmount];
+        chromosomes = new DirectionChromosome[ChromosomeAmount];
         for (byte i = 0; i < ChromosomeAmount; i++){
-            chromosomes[i] = new Chromosome(ChromosomeAmount);
+            chromosomes[i] = new DirectionChromosome(ChromosomeAmount);
         }
     }
 
-    public Chromosome GetChromosome(byte index){
-        return chromosomes[index];
+    public ref DirectionChromosome GetDirectionChromosome(byte index){
+        return ref chromosomes[index];
     }
 
     public void Mutate(){
         for (byte i = 0; i < ChromosomeAmount; i++){
             if (Random.Range(0.0f, 100.0f) <= chromosomeMutationChance){
-                Chromosome currentChromosome = chromosomes[i];
+                DirectionChromosome currentChromosome = chromosomes[i];
                 currentChromosome.MutateGenes(chromosomeMutationChance, this);
             } 
         }

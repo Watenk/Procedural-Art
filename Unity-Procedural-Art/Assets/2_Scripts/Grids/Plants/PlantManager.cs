@@ -11,11 +11,12 @@ public class PlantManager : IPhysicsUpdateable, IPlantGrid
     public Vector2Short GridSize { get; private set; }
 
     private Dictionary<Vector2Short, PlantCell> growingPlants;
+    private Dictionary<Vector2Short, PlantCell> grownPlants;
     private Dictionary<Vector2Short, PlantCell> livingPlants;
     private Dictionary<Vector2Short, PlantCell> deadPlants;
 
     private byte geneAmount;
-    private Dictionary<Cell, byte> plantEnergyData = new Dictionary<Cell, byte>();
+    private Dictionary<Cell, byte> plantGrowEnergyRequirements = new Dictionary<Cell, byte>();
 
     // Dependencies
     private ICellGrid cellGrid;
@@ -32,48 +33,23 @@ public class PlantManager : IPhysicsUpdateable, IPlantGrid
         geneAmount = Settings.Instance.GeneAmount;
 
         growingPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
+        grownPlants = new Dictionary<Vector2Short, PlantCell>();
         livingPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
         deadPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
 
-        foreach (PlantEnergyData current in Settings.Instance.plantEnergyData){
-            plantEnergyData.Add(current.cell, current.energyAmount);
+        foreach (PlantGrowEnergyRequirement current in Settings.Instance.plantGrowEnergyRequirements){
+            plantGrowEnergyRequirements.Add(current.cell, current.energyAmount);
         }
 
-        EventManager.AddListener<Vector2Int>(Events.OnLeftMouseDown, OnLeftMouseDown);
+        EventManager.AddListener<Vector2Int>(Events.OnLeftMouseDown, (mousePos) => AddPlant(new Vector2Short(mousePos)));
     }
 
     public void OnPhysicsUpdate(){
 
-        foreach (var current in growingPlants){
-
-
-            // Growing
-            ref Cell cell = ref cellGrid.GetCell(current.Key);
-            if (current.Value.Energy >= plantEnergyData[cell]){
-                bool didGrow = TryGrow(current.Value);
-                if (!didGrow) return;
-                
-                //livingPlants.Add(current.Value);
-            }
-
-            // Energy
-            ref byte lightLevel = ref lightGrid.GetCell(current.Key);
-            current.Value.Energy += lightLevel;
-        }
-
-        // // Garbage Collection
-        // foreach (var current in GCGrowingPlants) growingPlants.Remove(current);
-        // GCGrowingPlants.Clear();
-
-        // for (int y = 0; y < cellGrid.GridSize.y; y++){
-        //     for(int x = 0; x < cellGrid.GridSize.x; x++){
-        //         Vector2Int currentPos = new Vector2Int(x, y);
-        //         ref Plant currentGrowingPlant = ref growingPlants[x, y];
-        //         if (currentGrowingPlant == null) continue;
-
-        //         TryGrow(currentGrowingPlant, currentPos);
-        //     }
-        // }
+        UpdateGrowingPlants();
+        UpdateGrownPlants();
+        UpdateLivingPlants();
+        UpdateDeadPlants();
     }
 
     public void AddPlant(Vector2Short pos){
@@ -98,15 +74,58 @@ public class PlantManager : IPhysicsUpdateable, IPlantGrid
 
     //--------------------------------------------------
 
-    private void OnLeftMouseDown(Vector2Int mousePos){
-        AddPlant(new Vector2Short(mousePos));
+    private void UpdateGrowingPlants(){
+        foreach (var current in growingPlants){
+
+            if (current.Value.Energy >= plantGrowEnergyRequirements[cellGrid.GetCell(current.Key)]){ // If has enough energy to grow
+                grownPlants.Add(current.Key, current.Value); 
+            }
+
+            UpdateEnergy(current);
+        }
     }
 
-    private bool TryGrow(PlantCell plant){
-        return false;
+    private void UpdateGrownPlants(){
+        foreach (var current in grownPlants){
+            ref DirectionChromosome directionChromosome = ref current.Value.Genome.GetDirectionChromosome(current.Value.ThisGene);
+            TryGrowInDirection(ref directionChromosome, Vector2Short.Up);
+            TryGrowInDirection(ref directionChromosome, Vector2Short.Left);
+            TryGrowInDirection(ref directionChromosome, Vector2Short.Down);
+            TryGrowInDirection(ref directionChromosome, Vector2Short.Right);
+        }
+        grownPlants.Clear();
     }
 
-    // private void TryGrowInDirection(Vector2Int parentPos, Vector2Int direction){
+    private void UpdateLivingPlants(){
+        foreach (var current in livingPlants){
+
+            // Living time
+
+            UpdateEnergy(current);
+        }
+    }
+
+    private void UpdateDeadPlants(){
+        foreach (var current in deadPlants){
+
+            // Decay Time
+
+        }
+    }
+
+    private void UpdateEnergy(KeyValuePair<Vector2Short, PlantCell> kvp){
+        ref byte lightLevel = ref lightGrid.GetCell(kvp.Key);
+        if (kvp.Value.Energy + lightLevel <= 255){
+            kvp.Value.Energy += lightLevel;
+        }
+        else{
+            kvp.Value.Energy = 255;
+        }
+    }
+
+    private void TryGrowInDirection(ref DirectionChromosome directionChromosome, Vector2Short direction){
+        
+        directionChromosome.GetGene(direction);
         
     //     if (updatedPlants.Contains(parentPos)) return;
 
@@ -129,5 +148,5 @@ public class PlantManager : IPhysicsUpdateable, IPlantGrid
     //     plants[targetPos.x, targetPos.y] = new Plant(parentPlant.Genome.GetChromosome(chromosome), parentPlant.Genome);
     //     cellGridDrawable.AddChangedCell(targetPos);
     //     updatedPlants.Add(targetPos);
-    // }
+    }
 }

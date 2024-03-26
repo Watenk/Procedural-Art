@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Chromosome
+public class DirectionChromosome
 {
     private Dictionary<Vector2Short, byte> genes = new Dictionary<Vector2Short, byte>();
 
     //---------------------------
 
-    public Chromosome(int chromosomeAmount){
+    public DirectionChromosome(int chromosomeAmount){
         genes.Add(Vector2Short.Up, (byte)Random.Range(0, chromosomeAmount));
         genes.Add(Vector2Short.Left, (byte)Random.Range(0, chromosomeAmount));
         genes.Add(Vector2Short.Down, (byte)Random.Range(0, chromosomeAmount));

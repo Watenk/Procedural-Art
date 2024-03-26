@@ -60,7 +60,7 @@ public class Settings : ScriptableObject
     [Tooltip("Chance a seed Chromosome mutates")]
     public float ChromosomeMutationChance;
     [Tooltip("")]
-    public List<PlantEnergyData> plantEnergyData = new List<PlantEnergyData>();
+    public List<PlantGrowEnergyRequirement> plantGrowEnergyRequirements = new List<PlantGrowEnergyRequirement>();
 
     [Header("Prefabs")]
     public GameObject LightGridDebugPrefab;
