@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlantGridDebugger : IPhysicsUpdateable
+public class PlantGeneGridDebugger : IPhysicsUpdateable
 {
     private Text[,] mainDebugTexts;
     private Text[,] upDebugTexts;
@@ -12,16 +12,16 @@ public class PlantGridDebugger : IPhysicsUpdateable
     private Text[,] rightDebugTexts;
 
     // Cache
-    private GameObject plantGridDebugPrefab;
+    private GameObject plantGeneGridDebugPrefab;
 
     // Dependencies
     private IPlantGrid plantGrid;
 
     //-------------------------------------
 
-    public PlantGridDebugger(){
+    public PlantGeneGridDebugger(){
         plantGrid = GameManager.GetService<PlantManager>();
-        plantGridDebugPrefab = Settings.Instance.PlantGridDebugPrefab;
+        plantGeneGridDebugPrefab = Settings.Instance.PlantGeneGridDebugPrefab;
 
         mainDebugTexts = new Text[plantGrid.GridSize.x, plantGrid.GridSize.y];
         upDebugTexts = new Text[plantGrid.GridSize.x, plantGrid.GridSize.y];
@@ -30,7 +30,7 @@ public class PlantGridDebugger : IPhysicsUpdateable
         rightDebugTexts = new Text[plantGrid.GridSize.x, plantGrid.GridSize.y];
         for (int y = 0; y < plantGrid.GridSize.y; y++){
             for(int x = 0; x < plantGrid.GridSize.x; x++){
-                GameObject gameObject = GameObject.Instantiate(plantGridDebugPrefab, new Vector3(x, -y, 0), Quaternion.identity);
+                GameObject gameObject = GameObject.Instantiate(plantGeneGridDebugPrefab, new Vector3(x, -y, 0), Quaternion.identity);
                 Text[] texts = gameObject.GetComponentsInChildren<Text>();
                 mainDebugTexts[x, y] = texts[0];
                 upDebugTexts[x, y] = texts[1];

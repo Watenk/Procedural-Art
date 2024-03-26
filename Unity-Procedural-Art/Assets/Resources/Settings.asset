@@ -16,7 +16,9 @@ MonoBehaviour:
   MaxCamSize: 500
   ScrollSpeed: 5
   UPSTarget: 24
-  GridSize: {x: 10, y: 10}
+  GridSize:
+    x: 10
+    y: 10
   DesiredChunkSize:
     x: 100
     y: 100
@@ -31,4 +33,5 @@ MonoBehaviour:
   InactiveChromosomeAmount: 15
   ChromosomeMutationChance: 20
   LightGridDebugPrefab: {fileID: 497148073451968215, guid: 020e59e031a578c49b2e485351b4df0a, type: 3}
-  PlantGridDebugPrefab: {fileID: 5303346518441015767, guid: c3209429c86b38940ba9639835d567af, type: 3}
+  PlantGeneGridDebugPrefab: {fileID: 5303346518441015767, guid: c3209429c86b38940ba9639835d567af, type: 3}
+  PlantEnergyGridDebugPrefab: {fileID: 497148073451968215, guid: 92493cc27042b2c44befcba425618e17, type: 3}

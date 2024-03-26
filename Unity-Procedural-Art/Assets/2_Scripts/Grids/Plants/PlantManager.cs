@@ -15,6 +15,7 @@ public class PlantManager : IPhysicsUpdateable, IPlantGrid
     private Dictionary<Vector2Short, PlantCell> deadPlants;
 
     private byte geneAmount;
+    private Dictionary<Cell, byte> plantEnergyData = new Dictionary<Cell, byte>();
 
     // Dependencies
     private ICellGrid cellGrid;
@@ -34,15 +35,30 @@ public class PlantManager : IPhysicsUpdateable, IPlantGrid
         livingPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
         deadPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
 
+        foreach (PlantEnergyData current in Settings.Instance.plantEnergyData){
+            plantEnergyData.Add(current.cell, current.energyAmount);
+        }
+
         EventManager.AddListener<Vector2Int>(Events.OnLeftMouseDown, OnLeftMouseDown);
     }
 
     public void OnPhysicsUpdate(){
 
         foreach (var current in growingPlants){
-            // if (TryGrow(current.Value)){
-            //     //livingPlants.Add(current.Value);
-            // }
+
+
+            // Growing
+            ref Cell cell = ref cellGrid.GetCell(current.Key);
+            if (current.Value.Energy >= plantEnergyData[cell]){
+                bool didGrow = TryGrow(current.Value);
+                if (!didGrow) return;
+                
+                //livingPlants.Add(current.Value);
+            }
+
+            // Energy
+            ref byte lightLevel = ref lightGrid.GetCell(current.Key);
+            current.Value.Energy += lightLevel;
         }
 
         // // Garbage Collection
@@ -86,9 +102,9 @@ public class PlantManager : IPhysicsUpdateable, IPlantGrid
         AddPlant(new Vector2Short(mousePos));
     }
 
-    //private bool TryGrow(Plant plant){
-
-    //}
+    private bool TryGrow(PlantCell plant){
+        return false;
+    }
 
     // private void TryGrowInDirection(Vector2Int parentPos, Vector2Int direction){
         

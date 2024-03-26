@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.EditorTools;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Settings", menuName = "ScriptableObjects/Settings")]
@@ -56,11 +57,13 @@ public class Settings : ScriptableObject
     public byte GeneAmount;
     [Tooltip("How many inactive genes 1 plant has (Amount of genes that will not grow in a genome)")]
     public byte InactiveChromosomeAmount;
-    [Tooltip("Chance a seed gene mutates")]
+    [Tooltip("Chance a seed Chromosome mutates")]
     public float ChromosomeMutationChance;
-    [Tooltip("Chance a certain chromosome (direction) mutates if a gene mutates")]
+    [Tooltip("")]
+    public List<PlantEnergyData> plantEnergyData = new List<PlantEnergyData>();
 
     [Header("Prefabs")]
     public GameObject LightGridDebugPrefab;
-    public GameObject PlantGridDebugPrefab;
+    public GameObject PlantGeneGridDebugPrefab;
+    public GameObject PlantEnergyGridDebugPrefab;
 }

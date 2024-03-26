@@ -44,7 +44,8 @@ public class GameManager : MonoBehaviour
 
         // Debuggers
         //AddService(new LightGridDebugger());
-        AddService(new PlantGridDebugger());
+        //AddService(new PlantGeneGridDebugger());
+        AddService(new PlantEnergyGridDebugger());
 
         EventManager.Invoke(Events.OnProfilerInit, services);
 

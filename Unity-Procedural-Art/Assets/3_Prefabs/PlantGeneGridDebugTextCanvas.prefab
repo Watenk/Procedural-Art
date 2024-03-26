@@ -329,7 +329,7 @@ GameObject:
   - component: {fileID: 3051198628907968117}
   - component: {fileID: 2096784613858296864}
   m_Layer: 5
-  m_Name: PlantGridDebugTextCanvas
+  m_Name: PlantGeneGridDebugTextCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -404,7 +404,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &2096784613858296864
 MonoBehaviour:
   m_ObjectHideFlags: 0
