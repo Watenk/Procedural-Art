@@ -15,8 +15,8 @@ public class PlantManager : IPhysicsUpdateable
     private List<Vector2Short> livingPlants = new List<Vector2Short>();
     private List<Vector2Short> deadPlants = new List<Vector2Short>();
 
-    private byte geneAmount;
     private Dictionary<CellTypes, byte> plantGrowEnergyRequirements = new Dictionary<CellTypes, byte>();
+    private byte directionChromosomeAmount;
 
     // Dependencies
     private IGrid grid;
@@ -28,7 +28,7 @@ public class PlantManager : IPhysicsUpdateable
         grid = GameManager.GetService<GridManager>();
         renderableGrid = GameManager.GetService<GridManager>();
         GridSize = grid.GridSize;
-        geneAmount = Settings.Instance.GeneAmount;
+        directionChromosomeAmount = Settings.Instance.DirectionChromosomeAmount;
 
         foreach (PlantGrowEnergyRequirement current in Settings.Instance.plantGrowEnergyRequirements){
             plantGrowEnergyRequirements.Add(current.cell, current.energyAmount);
@@ -46,7 +46,7 @@ public class PlantManager : IPhysicsUpdateable
     }
 
     public void AddPlant(Vector2Short pos){
-        Genome genome = new Genome(geneAmount);
+        Genome genome = new Genome(directionChromosomeAmount);
         Cell cell = grid.GetCell(pos);
         
         cell.CellType = CellTypes.leave;
@@ -71,13 +71,12 @@ public class PlantManager : IPhysicsUpdateable
 
     private void UpdateGrownPlants(){
         foreach (Vector2Short currentPos in grownPlants){
-            ref Cell cell = ref grid.GetCell(currentPos);
-            ref DirectionChromosome directionChromosome = ref cell.PlantCell.Genome.GetDirectionChromosome(cell.PlantCell.ThisGene);
+            ref Cell parentCell = ref grid.GetCell(currentPos);
 
-            TryGrowInDirection(ref directionChromosome, Vector2Short.Up);
-            TryGrowInDirection(ref directionChromosome, Vector2Short.Left);
-            TryGrowInDirection(ref directionChromosome, Vector2Short.Down);
-            TryGrowInDirection(ref directionChromosome, Vector2Short.Right);
+            TryGrowInDirection(currentPos, ref parentCell, Vector2Short.Up);
+            TryGrowInDirection(currentPos, ref parentCell, Vector2Short.Left);
+            TryGrowInDirection(currentPos, ref parentCell, Vector2Short.Down);
+            TryGrowInDirection(currentPos, ref parentCell, Vector2Short.Right);
         }
         grownPlants.Clear();
     }
@@ -110,30 +109,22 @@ public class PlantManager : IPhysicsUpdateable
         }
     }
 
-    private void TryGrowInDirection(ref DirectionChromosome directionChromosome, Vector2Short direction){
+    private void TryGrowInDirection(Vector2Short parentPos, ref Cell parentCell, Vector2Short direction){
         
-        directionChromosome.GetGene(direction);
+        // Gene
+        ref DirectionChromosome directionChromosome = ref parentCell.PlantCell.Genome.GetDirectionChromosome(parentCell.PlantCell.ThisGene);
+        byte directionGene = directionChromosome.GetGene(direction);
+        if (directionGene >= directionChromosomeAmount - parentCell.PlantCell.Genome.InactiveDirectionChromosomeAmount) return; // If is Inactive
         
-    //     if (updatedPlants.Contains(parentPos)) return;
+        // target Pos
+        Vector2Short targetPos = parentPos + new Vector2Short(direction.x, -direction.y);
+        if (!grid.IsInBounds(targetPos)) return;
+        ref Cell targetCell = ref grid.GetCell(targetPos);
+        if (targetCell.CellType != CellTypes.air) return;
 
-    //     // Chromosome Parent
-    //     ref Plant parentPlant = ref plants[parentPos.x, parentPos.y];
-    //     byte chromosome = parentPlant.Gene.GetChromosome(direction);
-    //     //if (chromosome == -1) return; // If is Inactive
-
-    //     // Target Plant
-    //     Vector2Int targetPos = parentPos + new Vector2Int(direction.x, -direction.y);
-    //     if (!IsInBounds(targetPos)) return;
-    //     ref Cell targetCell = ref cellGrid.GetCell(targetPos);
-    //     if (targetCell != Cell.air) return;
-
-    //     // Light
-    //     ref byte lightLevel = ref lightGrid.GetCell(targetPos);
-    //     if (lightLevel == 0) return;
-
-    //     targetCell = Cell.leave;
-    //     plants[targetPos.x, targetPos.y] = new Plant(parentPlant.Genome.GetChromosome(chromosome), parentPlant.Genome);
-    //     cellGridDrawable.AddChangedCell(targetPos);
-    //     updatedPlants.Add(targetPos);
+        targetCell.CellType = CellTypes.leave;
+        targetCell.PlantCell = new PlantCell(directionGene, parentCell.PlantCell.Genome, 0);
+        growingPlants.Add(targetPos);
+        renderableGrid.AddChangedCell(targetPos);
     }
 }

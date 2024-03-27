@@ -29,7 +29,7 @@ public class LightManager : IPhysicsUpdateable
         // LightSource
         for (int y = 0; y < 1; y++){
             for(int x = 0; x < grid.GridSize.x; x++){
-                Cell currentCell = grid.GetCell(new Vector2Short(x, y));
+                ref Cell currentCell = ref grid.GetCell(new Vector2Short(x, y));
 
                 if (currentCell.CellType == CellTypes.air){
                     currentCell.LightLevel = (byte)Random.Range(minLight, maxLight);
@@ -43,8 +43,8 @@ public class LightManager : IPhysicsUpdateable
         // Other
         for (int y = 1; y < grid.GridSize.y; y++){
             for(int x = 0; x < grid.GridSize.x; x++){
-                Cell upCell = grid.GetCell(new Vector2Short(x, y - 1));
-                Cell currentCell = grid.GetCell(new Vector2Short(x, y));
+                ref Cell upCell = ref grid.GetCell(new Vector2Short(x, y - 1));
+                ref Cell currentCell = ref grid.GetCell(new Vector2Short(x, y));
                 
                 if (upCell.LightLevel != 0){
                     if (upCell.CellType != CellTypes.air){

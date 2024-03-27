@@ -5,35 +5,35 @@ using Watenk;
 
 public class Genome
 {
-    public byte ChromosomeAmount { get; private set; }
-    public byte InactiveChromosomeAmount { get; private set; }
+    public byte DirectionChromosomeAmount { get; private set; }
+    public byte InactiveDirectionChromosomeAmount { get; private set; }
 
-    private DirectionChromosome[] chromosomes;
+    private DirectionChromosome[] directionChromosomes;
 
     // Cache
     private float chromosomeMutationChance;
 
     //--------------------------------------
 
-    public Genome(byte chromosomeAmount){
-        ChromosomeAmount = chromosomeAmount;
+    public Genome(byte directionChromosomeAmount){
+        DirectionChromosomeAmount = directionChromosomeAmount;
         chromosomeMutationChance = Settings.Instance.ChromosomeMutationChance;
-        InactiveChromosomeAmount = Settings.Instance.InactiveChromosomeAmount;
+        InactiveDirectionChromosomeAmount = Settings.Instance.InactiveDirectionChromosomeAmount;
 
-        chromosomes = new DirectionChromosome[ChromosomeAmount];
-        for (byte i = 0; i < ChromosomeAmount; i++){
-            chromosomes[i] = new DirectionChromosome(ChromosomeAmount);
+        directionChromosomes = new DirectionChromosome[DirectionChromosomeAmount];
+        for (byte i = 0; i < DirectionChromosomeAmount; i++){
+            directionChromosomes[i] = new DirectionChromosome(DirectionChromosomeAmount);
         }
     }
 
     public ref DirectionChromosome GetDirectionChromosome(byte index){
-        return ref chromosomes[index];
+        return ref directionChromosomes[index];
     }
 
     public void Mutate(){
-        for (byte i = 0; i < ChromosomeAmount; i++){
+        for (byte i = 0; i < DirectionChromosomeAmount; i++){
             if (Random.Range(0.0f, 100.0f) <= chromosomeMutationChance){
-                DirectionChromosome currentChromosome = chromosomes[i];
+                DirectionChromosome currentChromosome = directionChromosomes[i];
                 currentChromosome.MutateGenes(chromosomeMutationChance, this);
             } 
         }

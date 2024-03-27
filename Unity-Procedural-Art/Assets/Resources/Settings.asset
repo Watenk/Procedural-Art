@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90aa108956453c246871797f9d3b35a8, type: 3}
   m_Name: Settings
   m_EditorClassIdentifier: 
-  MinCamSize: 5
+  MinCamSize: 1
   MaxCamSize: 1000
   ScrollSpeed: 5
   UPSTarget: 24
   GridSize:
-    x: 10
-    y: 10
+    x: 1000
+    y: 200
   DesiredChunkSize:
     x: 10
     y: 10
@@ -33,8 +33,8 @@ MonoBehaviour:
   ProfilerUpdateSpeed: 0.1
   MinLight: 3
   MaxLight: 5
-  GeneAmount: 30
-  InactiveChromosomeAmount: 15
+  DirectionChromosomeAmount: 30
+  InactiveDirectionChromosomeAmount: 20
   ChromosomeMutationChance: 20
   plantGrowEnergyRequirements:
   - cell: 0

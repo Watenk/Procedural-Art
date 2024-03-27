@@ -55,9 +55,9 @@ public class Settings : ScriptableObject
 
     [Header("Plants")]
     [Tooltip("How many genes 1 plant has")]
-    public byte GeneAmount;
+    public byte DirectionChromosomeAmount;
     [Tooltip("How many inactive genes 1 plant has (Amount of genes that will not grow in a genome)")]
-    public byte InactiveChromosomeAmount;
+    public byte InactiveDirectionChromosomeAmount;
     [Tooltip("Chance a seed Chromosome mutates")]
     public float ChromosomeMutationChance;
     [Tooltip("")]

@@ -23,7 +23,7 @@ public class DirectionChromosome
     public void MutateGenes(float mutationChance, Genome genome){
         foreach (var current in genes){
             if (Random.Range(0.0f, 100.0f) <= mutationChance){
-                genes[current.Key] = (byte)Random.Range(0, genome.ChromosomeAmount);
+                genes[current.Key] = (byte)Random.Range(0, genome.DirectionChromosomeAmount);
             }
         }
     }

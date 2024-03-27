@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
         AddService(new LightManager());
         AddService(new PlantManager());
         AddService(new MapGenerator());
-        AddService(new GridDebugger());
+        //AddService(new GridDebugger());
 
         AddService(new InputHandler());
         AddService(new CameraController());

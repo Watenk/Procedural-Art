@@ -155,6 +155,7 @@ public class Vector2Short
     public short y;
 
     //------------------------------------------
+    // Constructors
 
     public Vector2Short(){
         x = 0;
@@ -187,6 +188,24 @@ public class Vector2Short
         this.y = (short)vector2Int.y;
     }
 
+    // Operator Overloads
+    public static Vector2Short operator +(Vector2Short pos1, Vector2Short pos2){
+        return new Vector2Short(pos1.x + pos2.x, pos1.y + pos2.y);
+    }
+
+    public static Vector2Short operator -(Vector2Short pos1, Vector2Short pos2){
+        return new Vector2Short(pos1.x - pos2.x, pos1.y - pos2.y);
+    }
+
+    public static Vector2Short operator *(Vector2Short pos1, Vector2Short pos2){
+        return new Vector2Short(pos1.x * pos2.x, pos1.y * pos2.y);
+    }
+
+    public static Vector2Short operator /(Vector2Short pos1, Vector2Short pos2){
+        return new Vector2Short(pos1.x / pos2.x, pos1.y / pos2.y);
+    }
+
+    // System things
     public override string ToString(){
         return string.Format("{0}, {1}", x, y);
     }
