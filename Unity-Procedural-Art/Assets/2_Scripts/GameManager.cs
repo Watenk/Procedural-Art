@@ -31,21 +31,16 @@ public class GameManager : MonoBehaviour
         timerManager = AddService(new TimerManager());
         AddService(new Profiler());
 
-        AddService(new CellGridManager());
-        MapGenerator mapGenerator = new MapGenerator();
-        AddService(new CellGridRenderer());
+        AddService(new GridManager());
         AddService(new LightManager());
         AddService(new PlantManager());
+        AddService(new MapGenerator());
+        AddService(new GridDebugger());
 
         AddService(new InputHandler());
         AddService(new CameraController());
 
         AddService(new UIManager());
-
-        // Debuggers
-        //AddService(new LightGridDebugger());
-        //AddService(new PlantGeneGridDebugger());
-        AddService(new PlantEnergyGridDebugger());
 
         EventManager.Invoke(Events.OnProfilerInit, services);
 

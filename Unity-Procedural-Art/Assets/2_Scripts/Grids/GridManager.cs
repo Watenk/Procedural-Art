@@ -3,27 +3,35 @@ using System.Collections.Generic;
 using UnityEngine;
 using Watenk;
 
-public class CellGridManager : ICellGrid, ICellGridDrawable
+public class GridManager : IGrid, IRenderableGrid, IUpdateable
 {
     public Vector2Short GridSize { get; private set; }
-    
+
     private Cell[,] cells;
-
-    // Grid Rendering
     private List<Vector2Short> changedCells = new List<Vector2Short>();
+    private GridRenderer gridRenderer;
 
-    //-------------------------------------------
+    //-----------------------------------
 
-    public CellGridManager(){
+    public GridManager(){
 
         GridSize = Settings.Instance.GridSize;
 
         cells = new Cell[GridSize.x, GridSize.y];
         for (int y = 0; y < GridSize.y; y++){
             for(int x = 0; x < GridSize.x; x++){
-                cells[x, y] = Cell.air;
+                Cell newCell = new Cell{
+                    CellType = CellTypes.air
+                };
+                cells[x, y] = newCell;
             }
         }
+
+        gridRenderer = new GridRenderer(this, this, Settings.Instance.CellTypeAtlas, Settings.Instance.CellTypeAtlasSize, Settings.Instance.CellTypeSpriteSize);
+    }
+
+    public void OnUpdate(){
+        gridRenderer.OnUpdate();
     }
 
     public ref Cell GetCell(Vector2Short pos){
@@ -47,4 +55,5 @@ public class CellGridManager : ICellGrid, ICellGridDrawable
     public void AddChangedCell(Vector2Short pos){
         changedCells.Add(pos);
     }
+
 }

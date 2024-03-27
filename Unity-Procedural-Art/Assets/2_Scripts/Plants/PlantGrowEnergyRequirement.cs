@@ -6,6 +6,6 @@ using UnityEngine;
 [Serializable]
 public struct PlantGrowEnergyRequirement
 {
-    public Cell cell;
+    public CellTypes cell;
     public byte energyAmount;
 }

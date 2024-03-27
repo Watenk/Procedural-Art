@@ -5,29 +5,31 @@ using Unity.Collections;
 using UnityEngine;
 using Watenk;
 
-public class CellGridRenderer : IUpdateable
+public class GridRenderer : IUpdateable
 {
     private MeshFilter[,] meshFilters;
-    private Dictionary<Cell, Vector2> atlasUV00 = new Dictionary<Cell, Vector2>();
-    private Dictionary<Cell, Vector2> atlasUV11 = new Dictionary<Cell, Vector2>();
+    private Dictionary<CellTypes, Vector2> atlasUV00 = new Dictionary<CellTypes, Vector2>();
+    private Dictionary<CellTypes, Vector2> atlasUV11 = new Dictionary<CellTypes, Vector2>();
 
     // Cache
     private List<Vector2Short>[,] changedCells;
     private Vector2Short chunkSize;
     private Vector2Short chunksAmount;
     private Vector2Short gridSize;
+    private Vector2 uvFloatErrorMargin;
 
     // Dependencies
-    private ICellGridDrawable cellGridDrawable;
-    private ICellGrid cellGrid;
+    private IRenderableGrid renderableGrid;
+    private IGrid grid;
 
     //-----------------------------------------------
 
-    public CellGridRenderer(){
-        cellGrid = GameManager.GetService<CellGridManager>();
-        cellGridDrawable = GameManager.GetService<CellGridManager>();
-        gridSize = cellGrid.GridSize;
+    public GridRenderer(IGrid grid, IRenderableGrid renderableGrid, Material atlas, Vector2Short atlasSize, Vector2Short spriteSize){
+        this.grid = grid;
+        this.renderableGrid = renderableGrid;
+        gridSize = grid.GridSize;
         chunkSize = Settings.Instance.DesiredChunkSize;
+        uvFloatErrorMargin = Settings.Instance.UVFloatErrorMargin;
 
         if (gridSize.x < chunkSize.x) chunkSize.x = (short)gridSize.x;
         if (gridSize.y < chunkSize.y) chunkSize.y = (short)gridSize.y;
@@ -39,8 +41,8 @@ public class CellGridRenderer : IUpdateable
             }
         }
 
-        InitAtlas();
-        InitMeshes();
+        InitAtlas(atlasSize, spriteSize);
+        InitMeshes(atlas);
     }
 
     public void OnUpdate(){
@@ -52,7 +54,7 @@ public class CellGridRenderer : IUpdateable
         //     }
         // }
 
-        ref List<Vector2Short> gridChangedCells = ref cellGridDrawable.GetChangedCells();
+        ref List<Vector2Short> gridChangedCells = ref renderableGrid.GetChangedCells();
 
         // Sort changed Cells
         foreach (Vector2Short current in gridChangedCells){
@@ -68,33 +70,34 @@ public class CellGridRenderer : IUpdateable
             }
         }
 
-        cellGridDrawable.ClearChangedCells();
+        renderableGrid.ClearChangedCells();
     }
 
     //---------------------------------------------------------------
 
-    private void InitAtlas(){
-        int cellsAmount = Enum.GetNames(typeof(Cell)).Length;
+    private void InitAtlas(Vector2Short atlasSize, Vector2Short spriteSize){
+        int cellsAmount = Enum.GetNames(typeof(CellTypes)).Length;
         int index = 0;
-        for (int y = 0; y < Settings.Instance.AtlasSize.y; y += Settings.Instance.SpriteTextureSize.y){
-            for (int x = 0; x < Settings.Instance.AtlasSize.x; x += Settings.Instance.SpriteTextureSize.x){
+        for (int y = 0; y < atlasSize.y; y += spriteSize.y){
+            for (int x = 0; x < atlasSize.x; x += spriteSize.x){
                 if (index >= cellsAmount) { break; }
                 
-                Vector2 uv00 = AtlasPosToUV00(new Vector2Short(x, y));
-                Vector2 uv11 = AtlasPosToUV11(new Vector2Short(x, y));
+                // UV00 is bottom left and UV11 is top right
+                Vector2 uv00 = AtlasPosToUV00(new Vector2Short(x, y), atlasSize, spriteSize);
+                Vector2 uv11 = AtlasPosToUV11(new Vector2Short(x, y), atlasSize, spriteSize);
 
-                uv00 += Settings.Instance.UVFloatErrorMargin;
-                uv11 -= Settings.Instance.UVFloatErrorMargin;
+                uv00 += uvFloatErrorMargin;
+                uv11 -= uvFloatErrorMargin;
 
-                atlasUV00.Add((Cell)index, uv00);
-                atlasUV11.Add((Cell)index, uv11);
+                atlasUV00.Add((CellTypes)index, uv00);
+                atlasUV11.Add((CellTypes)index, uv11);
 
                 index++; 
             }
         }
     }
 
-    private void InitMeshes(){
+    private void InitMeshes(Material atlas){
         meshFilters = new MeshFilter[chunksAmount.x, chunksAmount.y];
 
         // Instance MeshFilter GameObjects
@@ -106,7 +109,7 @@ public class CellGridRenderer : IUpdateable
 
                 MeshRenderer meshRenderer = newMesh.AddComponent<MeshRenderer>();
                 meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                meshRenderer.material = Settings.Instance.Atlas;
+                meshRenderer.material = atlas;
                 meshFilters[x, y] = newMesh.AddComponent<MeshFilter>();
             }
         }
@@ -135,11 +138,10 @@ public class CellGridRenderer : IUpdateable
             for (int x = 0; x < size.x; x++){
 
                 Vector2Short chunkOrgin = CalcChunkOrgin(chunkIndex);
-                ref Cell currentCell = ref cellGrid.GetCell(new Vector2Short(chunkOrgin.x + x, chunkOrgin.y + y));
+                CellTypes currentCell = grid.GetCell(new Vector2Short(chunkOrgin.x + x, chunkOrgin.y + y)).CellType;
 
                 // Vertices
-                // This generates 4 vertices clockwise because a quad had 4 vertices
-                // Vertices start rendering from the bottom left
+                // Generates 4 vertices clockwise because a quad had 4 vertices
                 verticeIndex = index * 4; // 
                 vertices[verticeIndex + 0] = new Vector3(x    , -y    , 0);
                 vertices[verticeIndex + 1] = new Vector3(x    , -y + 1, 0);
@@ -147,7 +149,7 @@ public class CellGridRenderer : IUpdateable
                 vertices[verticeIndex + 3] = new Vector3(x + 1, -y    , 0);
 
                 // Triangles
-                // This assigns the order the vertices are connected
+                // Assigns the order the vertices are connected
                 triangleIndex = index * 6;
                 // Triangle 1
                 triangles[triangleIndex + 0] = verticeIndex + 0;
@@ -186,7 +188,7 @@ public class CellGridRenderer : IUpdateable
         foreach (Vector2Short currentCellPos in changedCellsInChunk){
 
             Vector2Short chunkOrgin = CalcChunkOrgin(chunkIndex);
-            ref Cell currentCell = ref cellGrid.GetCell(currentCellPos);
+            CellTypes currentCell = grid.GetCell(currentCellPos).CellType;
             int index = (currentCellPos.x - chunkOrgin.x) + (currentCellPos.y - chunkOrgin.y) * chunkSize.y;
             int verticeIndex = 4 * index;
 
@@ -201,15 +203,15 @@ public class CellGridRenderer : IUpdateable
         meshFilter.mesh.uv = uv;
     }
 
-    private Vector2 AtlasPosToUV00(Vector2Short pos){
-        float xUV = MathUtility.Map(pos.x, 0, Settings.Instance.AtlasSize.x, 0, 1);
-        float yUV = MathUtility.Map(pos.y + Settings.Instance.SpriteTextureSize.y, 0, Settings.Instance.AtlasSize.y, 1, 0);
+    private Vector2 AtlasPosToUV00(Vector2Short pos, Vector2Short atlasSize, Vector2Short spriteSize){
+        float xUV = MathUtility.Map(pos.x, 0, atlasSize.x, 0, 1);
+        float yUV = MathUtility.Map(pos.y + spriteSize.y, 0, atlasSize.y, 1, 0);
         return new Vector2(xUV, yUV);
     }
 
-    private Vector2 AtlasPosToUV11(Vector2Short pos){
-        float xUV = MathUtility.Map(pos.x + Settings.Instance.SpriteTextureSize.x, 0, Settings.Instance.AtlasSize.x, 0, 1);
-        float yUV = MathUtility.Map(pos.y, 0, Settings.Instance.AtlasSize.y, 1, 0);
+    private Vector2 AtlasPosToUV11(Vector2Short pos, Vector2Short atlasSize, Vector2Short spriteSize){
+        float xUV = MathUtility.Map(pos.x + spriteSize.x, 0, atlasSize.x, 0, 1);
+        float yUV = MathUtility.Map(pos.y, 0, atlasSize.y, 1, 0);
         return new Vector2(xUV, yUV);
     }
 

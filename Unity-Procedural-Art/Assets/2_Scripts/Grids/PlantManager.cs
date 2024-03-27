@@ -5,37 +5,30 @@ using Unity.Collections;
 using UnityEngine;
 using Watenk;
 
-public class PlantManager : IPhysicsUpdateable, IPlantGrid
+public class PlantManager : IPhysicsUpdateable
 {
     // Settings: Gravity, Atmosphere, Light, wind, radiation, Temperature
     public Vector2Short GridSize { get; private set; }
 
-    private Dictionary<Vector2Short, PlantCell> growingPlants;
-    private Dictionary<Vector2Short, PlantCell> grownPlants;
-    private Dictionary<Vector2Short, PlantCell> livingPlants;
-    private Dictionary<Vector2Short, PlantCell> deadPlants;
+    private List<Vector2Short> growingPlants = new List<Vector2Short>();
+    private List<Vector2Short> grownPlants = new List<Vector2Short>();
+    private List<Vector2Short> livingPlants = new List<Vector2Short>();
+    private List<Vector2Short> deadPlants = new List<Vector2Short>();
 
     private byte geneAmount;
-    private Dictionary<Cell, byte> plantGrowEnergyRequirements = new Dictionary<Cell, byte>();
+    private Dictionary<CellTypes, byte> plantGrowEnergyRequirements = new Dictionary<CellTypes, byte>();
 
     // Dependencies
-    private ICellGrid cellGrid;
-    private ILightGrid lightGrid;
-    private ICellGridDrawable cellGridDrawable;
+    private IGrid grid;
+    private IRenderableGrid renderableGrid;
 
     //---------------------------------------------------
 
     public PlantManager(){
-        cellGrid = GameManager.GetService<CellGridManager>();
-        lightGrid = GameManager.GetService<LightManager>();
-        cellGridDrawable = GameManager.GetService<CellGridManager>();
-        GridSize = cellGrid.GridSize;
+        grid = GameManager.GetService<GridManager>();
+        renderableGrid = GameManager.GetService<GridManager>();
+        GridSize = grid.GridSize;
         geneAmount = Settings.Instance.GeneAmount;
-
-        growingPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
-        grownPlants = new Dictionary<Vector2Short, PlantCell>();
-        livingPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
-        deadPlants = new Dictionary<Vector2Short, PlantCell>(GridSize.x * GridSize.y);
 
         foreach (PlantGrowEnergyRequirement current in Settings.Instance.plantGrowEnergyRequirements){
             plantGrowEnergyRequirements.Add(current.cell, current.energyAmount);
@@ -54,40 +47,33 @@ public class PlantManager : IPhysicsUpdateable, IPlantGrid
 
     public void AddPlant(Vector2Short pos){
         Genome genome = new Genome(geneAmount);
-        ref Cell currentCell = ref cellGrid.GetCell(pos);
+        Cell cell = grid.GetCell(pos);
         
-        currentCell = Cell.leave;
-        growingPlants.Add(pos, new PlantCell(0, genome));
-        cellGridDrawable.AddChangedCell(pos);
-    }
-
-    public PlantCell GetCell(Vector2Short pos){
-        if (!growingPlants.ContainsKey(pos)) return null;
-
-        return growingPlants[pos];
-    }
-
-    public bool IsInBounds(Vector2Short pos){
-        if (GridUtility.IsInBounds(pos, Vector2Short.Zero, GridSize)) return true;
-        else return false;
+        cell.CellType = CellTypes.leave;
+        cell.PlantCell = new PlantCell(0, genome, 0);
+        growingPlants.Add(pos);
+        renderableGrid.AddChangedCell(pos);
     }
 
     //--------------------------------------------------
 
     private void UpdateGrowingPlants(){
-        foreach (var current in growingPlants){
+        foreach (Vector2Short currentPos in growingPlants){
 
-            if (current.Value.Energy >= plantGrowEnergyRequirements[cellGrid.GetCell(current.Key)]){ // If has enough energy to grow
-                grownPlants.Add(current.Key, current.Value); 
+            ref Cell cell = ref grid.GetCell(currentPos);
+            if (cell.PlantCell.Energy >= plantGrowEnergyRequirements[cell.CellType]){ // If has enough energy to grow
+                grownPlants.Add(currentPos); 
             }
 
-            UpdateEnergy(current);
+            UpdateEnergy(ref cell);
         }
     }
 
     private void UpdateGrownPlants(){
-        foreach (var current in grownPlants){
-            ref DirectionChromosome directionChromosome = ref current.Value.Genome.GetDirectionChromosome(current.Value.ThisGene);
+        foreach (Vector2Short currentPos in grownPlants){
+            ref Cell cell = ref grid.GetCell(currentPos);
+            ref DirectionChromosome directionChromosome = ref cell.PlantCell.Genome.GetDirectionChromosome(cell.PlantCell.ThisGene);
+
             TryGrowInDirection(ref directionChromosome, Vector2Short.Up);
             TryGrowInDirection(ref directionChromosome, Vector2Short.Left);
             TryGrowInDirection(ref directionChromosome, Vector2Short.Down);
@@ -97,29 +83,30 @@ public class PlantManager : IPhysicsUpdateable, IPlantGrid
     }
 
     private void UpdateLivingPlants(){
-        foreach (var current in livingPlants){
+        foreach (Vector2Short currentpos in livingPlants){
+
+            ref Cell cell = ref grid.GetCell(currentpos);
 
             // Living time
 
-            UpdateEnergy(current);
+            UpdateEnergy(ref cell);
         }
     }
 
     private void UpdateDeadPlants(){
-        foreach (var current in deadPlants){
+        foreach (Vector2Short currentPos in deadPlants){
 
             // Decay Time
 
         }
     }
 
-    private void UpdateEnergy(KeyValuePair<Vector2Short, PlantCell> kvp){
-        ref byte lightLevel = ref lightGrid.GetCell(kvp.Key);
-        if (kvp.Value.Energy + lightLevel <= 255){
-            kvp.Value.Energy += lightLevel;
+    private void UpdateEnergy(ref Cell cell){
+        if (cell.PlantCell.Energy + cell.LightLevel <= 255){
+            cell.PlantCell.Energy += cell.LightLevel;
         }
         else{
-            kvp.Value.Energy = 255;
+            cell.PlantCell.Energy = 255;
         }
     }
 

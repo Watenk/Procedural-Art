@@ -22,10 +22,14 @@ MonoBehaviour:
   DesiredChunkSize:
     x: 10
     y: 10
-  Atlas: {fileID: 2100000, guid: a70c200ea6747aa40bdc4c73fe810097, type: 2}
-  AtlasSize: {x: 160, y: 160}
-  SpriteTextureSize: {x: 32, y: 32}
   UVFloatErrorMargin: {x: 0.00001, y: 0.00001}
+  CellTypeAtlas: {fileID: 2100000, guid: a70c200ea6747aa40bdc4c73fe810097, type: 2}
+  CellTypeAtlasSize:
+    x: 160
+    y: 160
+  CellTypeSpriteSize:
+    x: 32
+    y: 32
   ProfilerUpdateSpeed: 0.1
   MinLight: 3
   MaxLight: 5
@@ -39,6 +43,5 @@ MonoBehaviour:
     energyAmount: 10
   - cell: 2
     energyAmount: 10
-  LightGridDebugPrefab: {fileID: 497148073451968215, guid: 020e59e031a578c49b2e485351b4df0a, type: 3}
-  PlantGeneGridDebugPrefab: {fileID: 5303346518441015767, guid: c3209429c86b38940ba9639835d567af, type: 3}
-  PlantEnergyGridDebugPrefab: {fileID: 497148073451968215, guid: 92493cc27042b2c44befcba425618e17, type: 3}
+  SingleValueGridPrefab: {fileID: 497148073451968215, guid: 92493cc27042b2c44befcba425618e17, type: 3}
+  GeneGridDebugPrefab: {fileID: 5303346518441015767, guid: c3209429c86b38940ba9639835d567af, type: 3}

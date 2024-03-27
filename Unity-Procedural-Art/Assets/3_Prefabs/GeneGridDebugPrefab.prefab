@@ -329,7 +329,7 @@ GameObject:
   - component: {fileID: 3051198628907968117}
   - component: {fileID: 2096784613858296864}
   m_Layer: 5
-  m_Name: PlantGeneGridDebugTextCanvas
+  m_Name: GeneGridDebugPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
