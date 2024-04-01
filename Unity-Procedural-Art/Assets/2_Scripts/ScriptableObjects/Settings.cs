@@ -60,7 +60,17 @@ public class Settings : ScriptableObject
     public byte InactiveDirectionChromosomeAmount;
     [Tooltip("Chance a seed Chromosome mutates")]
     public float ChromosomeMutationChance;
-    [Tooltip("")]
+    [Tooltip("Age at which a plant dies (in updates)")]
+    public ushort PlantDieAge;
+    [Tooltip("Age at which a seed grows (in updates)")]
+    public ushort SeedGrowAge;
+    [Tooltip("Age at which a plant rots away (in updates)")]
+    public ushort RotAge;
+    [Tooltip("Delay in updates that a plant eats (in updates)")]
+    public ushort EatingDelay;
+    public byte WoodEnergyTransferAmount;
+    public byte LeavesEnergyTransferAmount;
+    [Tooltip("Energy requirement to grow a certain type of plant")]
     public List<PlantGrowEnergyRequirement> plantGrowEnergyRequirements = new List<PlantGrowEnergyRequirement>();
 
     [Header("Prefabs")]

@@ -16,7 +16,9 @@ public class PlantManager : IPhysicsUpdateable
     private List<Vector2Short> growingPlants = new List<Vector2Short>();
     private List<Vector2Short> grownPlants = new List<Vector2Short>();
     private List<Vector2Short> livingPlants = new List<Vector2Short>();
+    private List<Vector2Short> livingPlantsGC = new List<Vector2Short>();
     private List<Vector2Short> deadPlants = new List<Vector2Short>();
+    private List<Vector2Short> deadPlantsGC = new List<Vector2Short>();
 
     private Dictionary<CellTypes, byte> plantGrowEnergyRequirements = new Dictionary<CellTypes, byte>();
     private byte directionChromosomeAmount;
@@ -54,11 +56,11 @@ public class PlantManager : IPhysicsUpdateable
 
     public void OnPhysicsUpdate(){
 
-        UpdateDeadPlants();
-        UpdateLivingPlants();
-        UpdateGrownPlants();
-        UpdateGrowingPlants();
         UpdateSeedPlants();
+        UpdateGrowingPlants();
+        UpdateGrownPlants();
+        UpdateLivingPlants();
+        UpdateDeadPlants();
     }
 
     public void AddSeed(Vector2Short pos){
@@ -85,8 +87,6 @@ public class PlantManager : IPhysicsUpdateable
             Cell currentCell = cellGrid.Get(currentPos);
             Cell downCell = cellGrid.Get(downPos);
 
-            if (seedPlant == null) Debug.Log("NEEEE");
-
             // Fall
             if (downCell.CellType == CellTypes.air){
                 seedPlantGrid.Set(downPos, seedPlant);
@@ -112,7 +112,7 @@ public class PlantManager : IPhysicsUpdateable
             }
 
             // Germinate
-            if (seedPlant.LifeTime >= 500){
+            if (seedPlant.LifeTime >= Settings.Instance.SeedGrowAge){
                 seedPlantGrid.Set(currentPos, null);
                 seedPlantsGC.Add(currentPos);
                 growingPlantGrid.Set(currentPos, new GrowingPlant(0, seedPlant.Genome, seedPlant.Energy));
@@ -143,10 +143,16 @@ public class PlantManager : IPhysicsUpdateable
     private void UpdateGrownPlants(){
         foreach (Vector2Short currentPos in grownPlants){
 
+            growingPlants.Remove(currentPos);
+
             TryGrowInDirection(currentPos, Vector2Short.Up);
             TryGrowInDirection(currentPos, Vector2Short.Left);
             TryGrowInDirection(currentPos, Vector2Short.Down);
             TryGrowInDirection(currentPos, Vector2Short.Right);
+
+            livingPlants.Add(currentPos);
+            livingPlantGrid.Set(currentPos, new LivingPlant(growingPlantGrid.Get(currentPos).Energy));
+            growingPlantGrid.Set(currentPos, null);
         }
         grownPlants.Clear();
     }
@@ -156,16 +162,57 @@ public class PlantManager : IPhysicsUpdateable
 
             LivingPlant livingPlant = livingPlantGrid.Get(currentPos);
             livingPlant.Energy = UpdateEnergy(livingPlant.Energy, lightGrid.Get(currentPos));
-            livingPlantGrid.Set(currentPos, livingPlant);
+            livingPlant.LifeTime += 1;
+            livingPlant.EatTime += 1;
+
+            if (livingPlant.EatTime >= Settings.Instance.EatingDelay){
+                livingPlant.EatTime = 0;
+                livingPlant.Energy -= 1;
+            }
+
+            TryTransferEnergyInDirection(currentPos, Vector2Short.Down);
+            TryTransferEnergyInDirection(currentPos, Vector2Short.Down);
+            TryTransferEnergyInDirection(currentPos, Vector2Short.Up);
+            TryTransferEnergyInDirection(currentPos, Vector2Short.Left);
+            TryTransferEnergyInDirection(currentPos, Vector2Short.Right);
+
+            if (livingPlant.LifeTime >= Settings.Instance.PlantDieAge || livingPlant.Energy <= 0){ // Die
+                Cell cell = cellGrid.Get(currentPos);
+                cell.CellType = CellTypes.dead;
+                cellGrid.Set(currentPos, cell);
+                livingPlantGrid.Set(currentPos, null);
+                deadPlants.Add(currentPos);
+                deadPlantGrid.Set(currentPos, new DeadPlant());
+                livingPlantsGC.Add(currentPos);
+                gridRenderer.Update(currentPos);
+            }
+            else{
+                livingPlantGrid.Set(currentPos, livingPlant);
+            }
         }
+        foreach (Vector2Short current in livingPlantsGC) livingPlants.Remove(current);
+        livingPlantsGC.Clear();
     }
 
     private void UpdateDeadPlants(){
         foreach (Vector2Short currentPos in deadPlants){
-
-            // Decay Time
-
+            
+            DeadPlant deadPlant = deadPlantGrid.Get(currentPos);
+            deadPlant.LifeTime += 1;
+            if (deadPlant.LifeTime >= Settings.Instance.RotAge){
+                Cell cell = cellGrid.Get(currentPos);
+                cell.CellType = CellTypes.air;
+                cellGrid.Set(currentPos, cell);
+                deadPlantGrid.Set(currentPos, null);
+                deadPlantsGC.Add(currentPos);
+                gridRenderer.Update(currentPos);
+            }
+            else{
+                deadPlantGrid.Set(currentPos, deadPlant);
+            }
         }
+        foreach (Vector2Short current in deadPlantsGC) deadPlants.Remove(current);
+        deadPlantsGC.Clear();
     }
 
     private byte UpdateEnergy(byte currentEnergy, Light light){
@@ -196,5 +243,36 @@ public class PlantManager : IPhysicsUpdateable
         growingPlantGrid.Set(targetPos, targetGrowingPlant);
         growingPlants.Add(targetPos);
         gridRenderer.Update(targetPos);
+    }
+
+    private void TryTransferEnergyInDirection(Vector2Short parentPos, Vector2Short direction){
+
+        Vector2Short targetPos = parentPos + new Vector2Short(direction.x, -direction.y);
+        if (!cellGrid.IsInBounds(targetPos)) return;
+        LivingPlant directionPlant = livingPlantGrid.Get(targetPos);
+        if (directionPlant == null) return;
+        Cell directionCell = cellGrid.Get(targetPos);
+        LivingPlant parentPlant = livingPlantGrid.Get(parentPos);
+        byte transferAmount;
+        if (directionCell.CellType == CellTypes.wood){
+            transferAmount = Settings.Instance.WoodEnergyTransferAmount;
+        }
+        else{
+            transferAmount = Settings.Instance.LeavesEnergyTransferAmount;
+        }
+        if (directionCell.CellType == CellTypes.wood || directionCell.CellType == CellTypes.leave && parentPlant.Energy >= 10){
+            int newEnergy = directionPlant.Energy + transferAmount;
+            if (newEnergy >= 255){
+                transferAmount = (byte)(newEnergy - 255);
+            }
+            directionPlant.Energy += transferAmount;
+            livingPlantGrid.Set(targetPos, directionPlant);
+            if ((int)parentPlant.Energy - (int)transferAmount < 0){
+                parentPlant.Energy = 0;
+            }
+            else{
+                parentPlant.Energy -= transferAmount;
+            }
+        }
     }
 }

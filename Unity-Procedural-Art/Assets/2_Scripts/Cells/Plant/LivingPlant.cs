@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LivingPlant
 {
+    public byte EatTime;
     public ushort LifeTime;
     public byte Energy;
 
@@ -13,6 +14,7 @@ public class LivingPlant
 
     public LivingPlant(byte energy){
         LifeTime = 0;
+        EatTime = 0;
         Energy = energy;
     }
 }

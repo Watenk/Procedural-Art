@@ -17,8 +17,8 @@ MonoBehaviour:
   ScrollSpeed: 5
   UPSTarget: 60
   GridSize:
-    x: 20
-    y: 20
+    x: 200
+    y: 100
   DesiredChunkSize:
     x: 10
     y: 10
@@ -36,6 +36,12 @@ MonoBehaviour:
   DirectionChromosomeAmount: 30
   InactiveDirectionChromosomeAmount: 20
   ChromosomeMutationChance: 20
+  PlantDieAge: 3000
+  SeedGrowAge: 300
+  RotAge: 1000
+  EatingDelay: 10
+  WoodEnergyTransferAmount: 2
+  LeavesEnergyTransferAmount: 1
   plantGrowEnergyRequirements:
   - cell: 0
     energyAmount: 10

@@ -9,4 +9,5 @@ public enum CellTypes
     seed,
     air,
     dirt,
+    dead,
 }
