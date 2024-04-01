@@ -5,28 +5,27 @@ using Unity.Collections;
 using UnityEngine;
 using Watenk;
 
-public class GridRenderer : IUpdateable
+public class GridRenderer : IUpdateable, IGridRenderer
 {
     private MeshFilter[,] meshFilters;
     private Dictionary<CellTypes, Vector2> atlasUV00 = new Dictionary<CellTypes, Vector2>();
     private Dictionary<CellTypes, Vector2> atlasUV11 = new Dictionary<CellTypes, Vector2>();
+    private List<Vector2Short> changedCells = new List<Vector2Short>();
 
     // Cache
-    private List<Vector2Short>[,] changedCells;
+    private List<Vector2Short>[,] changedCellsArray;
     private Vector2Short chunkSize;
     private Vector2Short chunksAmount;
     private Vector2Short gridSize;
     private Vector2 uvFloatErrorMargin;
 
     // Dependencies
-    private IRenderableGrid renderableGrid;
-    private IGrid grid;
+    private IGrid<Cell> cellGrid;
 
     //-----------------------------------------------
 
-    public GridRenderer(IGrid grid, IRenderableGrid renderableGrid, Material atlas, Vector2Short atlasSize, Vector2Short spriteSize){
-        this.grid = grid;
-        this.renderableGrid = renderableGrid;
+    public GridRenderer(IGrid<Cell> grid, Material atlas, Vector2Short atlasSize, Vector2Short spriteSize){
+        this.cellGrid = grid;
         gridSize = grid.GridSize;
         chunkSize = Settings.Instance.DesiredChunkSize;
         uvFloatErrorMargin = Settings.Instance.UVFloatErrorMargin;
@@ -34,10 +33,10 @@ public class GridRenderer : IUpdateable
         if (gridSize.x < chunkSize.x) chunkSize.x = (short)gridSize.x;
         if (gridSize.y < chunkSize.y) chunkSize.y = (short)gridSize.y;
         chunksAmount = new Vector2Short(Mathf.CeilToInt((float)gridSize.x / (float)chunkSize.x), Mathf.CeilToInt((float)gridSize.y / (float)chunkSize.y));
-        changedCells = new List<Vector2Short>[chunksAmount.x ,chunksAmount.y];
+        changedCellsArray = new List<Vector2Short>[chunksAmount.x ,chunksAmount.y];
         for (int y = 0; y < chunksAmount.y; y++){
             for (int x = 0; x < chunksAmount.x; x++){
-                changedCells[x, y] = new List<Vector2Short>();
+                changedCellsArray[x, y] = new List<Vector2Short>();
             }
         }
 
@@ -54,23 +53,25 @@ public class GridRenderer : IUpdateable
         //     }
         // }
 
-        ref List<Vector2Short> gridChangedCells = ref renderableGrid.GetChangedCells();
-
         // Sort changed Cells
-        foreach (Vector2Short current in gridChangedCells){
+        foreach (Vector2Short current in changedCells){
             
             Vector2Short chunkIndex = PosToChunkIndex(current);
-            changedCells[chunkIndex.x, chunkIndex.y].Add(current);
+            changedCellsArray[chunkIndex.x, chunkIndex.y].Add(current);
         }
 
         for (int y = 0; y < chunksAmount.y; y++){
             for (int x = 0; x < chunksAmount.x; x++){
-                UpdateMesh(changedCells[x, y], meshFilters[x, y] , new Vector2Short(x, y));
-                changedCells[x, y].Clear();
+                UpdateMesh(changedCellsArray[x, y], meshFilters[x, y] , new Vector2Short(x, y));
+                changedCellsArray[x, y].Clear();
             }
         }
 
-        renderableGrid.ClearChangedCells();
+        changedCells.Clear();
+    }
+
+    public void Change(Vector2Short pos){
+        if (!changedCells.Contains(pos)) changedCells.Add(pos);
     }
 
     //---------------------------------------------------------------
@@ -138,7 +139,7 @@ public class GridRenderer : IUpdateable
             for (int x = 0; x < size.x; x++){
 
                 Vector2Short chunkOrgin = CalcChunkOrgin(chunkIndex);
-                CellTypes currentCell = grid.GetCell(new Vector2Short(chunkOrgin.x + x, chunkOrgin.y + y)).CellType;
+                CellTypes currentCell = cellGrid.Get(new Vector2Short(chunkOrgin.x + x, chunkOrgin.y + y)).CellType;
 
                 // Vertices
                 // Generates 4 vertices clockwise because a quad had 4 vertices
@@ -188,7 +189,7 @@ public class GridRenderer : IUpdateable
         foreach (Vector2Short currentCellPos in changedCellsInChunk){
 
             Vector2Short chunkOrgin = CalcChunkOrgin(chunkIndex);
-            CellTypes currentCell = grid.GetCell(currentCellPos).CellType;
+            CellTypes currentCell = cellGrid.Get(currentCellPos).CellType;
             int index = (currentCellPos.x - chunkOrgin.x) + (currentCellPos.y - chunkOrgin.y) * chunkSize.y;
             int verticeIndex = 4 * index;
 

@@ -5,20 +5,30 @@ using UnityEngine;
 public class MapGenerator
 {
     // Dependencies
-    private IGrid grid;
-    private IRenderableGrid renderableGrid;
+    private IGrid<Cell> cellGrid;
+    private IGridRenderer gridRenderer;
 
     //--------------------------------------
 
     public MapGenerator(){
-        grid = GameManager.GetService<GridManager>();
-        renderableGrid = GameManager.GetService<GridManager>();
+        cellGrid = GameManager.GetService<GridManager>().GetGrid<Cell>();
+        gridRenderer = GameManager.GetService<GridRenderer>();
 
-        for (int y = grid.GridSize.y - 5; y < grid.GridSize.y; y++){
-            for(int x = 0; x < grid.GridSize.x; x++){
-                ref Cell currentCell = ref grid.GetCell(new Vector2Short(x, y));
+        for (int y = 0; y < cellGrid.GridSize.y; y++){
+            for(int x = 0; x < cellGrid.GridSize.x; x++){
+                Cell currentCell = cellGrid.Get(new Vector2Short(x, y));
+                currentCell.CellType = CellTypes.air;
+                cellGrid.Set(new Vector2Short(x, y), currentCell);
+                gridRenderer.Change(new Vector2Short(x, y));
+            }
+        }
+
+        for (int y = cellGrid.GridSize.y - 5; y < cellGrid.GridSize.y; y++){
+            for(int x = 0; x < cellGrid.GridSize.x; x++){
+                Cell currentCell = cellGrid.Get(new Vector2Short(x, y));
                 currentCell.CellType = CellTypes.dirt;
-                renderableGrid.AddChangedCell(new Vector2Short(x, y));
+                cellGrid.Set(new Vector2Short(x, y), currentCell);
+                gridRenderer.Change(new Vector2Short(x, y));
             }
         }
     }

@@ -1,59 +1,51 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Watenk;
 
-public class GridManager : IGrid, IRenderableGrid, IUpdateable
+public class GridManager
 {
     public Vector2Short GridSize { get; private set; }
 
-    private Cell[,] cells;
-    private List<Vector2Short> changedCells = new List<Vector2Short>();
-    private GridRenderer gridRenderer;
+    private Dictionary<Type, object> arrayGrids = new Dictionary<Type, object>();
+    private Dictionary<Type, object> listGrids = new Dictionary<Type, object>();
 
     //-----------------------------------
 
     public GridManager(){
-
         GridSize = Settings.Instance.GridSize;
 
-        cells = new Cell[GridSize.x, GridSize.y];
-        for (int y = 0; y < GridSize.y; y++){
-            for(int x = 0; x < GridSize.x; x++){
-                Cell newCell = new Cell{
-                    CellType = CellTypes.air
-                };
-                cells[x, y] = newCell;
-            }
+        AddArrayGrid<Cell>();
+        AddArrayGrid<Light>();
+
+        AddListGrid<SeedPlant>();
+        AddListGrid<GrowingPlant>();
+        AddListGrid<LivingPlant>();
+        AddListGrid<DeadPlant>();
+    }
+
+    public IGrid<T> GetGrid<T>() where T : new(){
+        if (arrayGrids.TryGetValue(typeof(T), out object arrayGrid)){
+            return (ArrayGrid<T>)arrayGrid;
         }
-
-        gridRenderer = new GridRenderer(this, this, Settings.Instance.CellTypeAtlas, Settings.Instance.CellTypeAtlasSize, Settings.Instance.CellTypeSpriteSize);
+        else if (listGrids.TryGetValue(typeof(T), out object listGrid)){
+            return (ListGrid<T>)listGrid;
+        }
+        else{
+            Debug.LogError("Couldn't find grid of type " + typeof(T).ToString());
+            return null;
+        }
     }
 
-    public void OnUpdate(){
-        gridRenderer.OnUpdate();
+    public IGrid<T> AddArrayGrid<T>() where T : new(){
+        ArrayGrid<T> newGrid = new ArrayGrid<T>(GridSize);
+        arrayGrids[typeof(T)] = newGrid;
+        return newGrid;
     }
 
-    public ref Cell GetCell(Vector2Short pos){
-        return ref cells[pos.x, pos.y];
+    public IGrid<T> AddListGrid<T>() where T : new(){
+        ListGrid<T> newGrid = new ListGrid<T>(GridSize);
+        listGrids[typeof(T)] = newGrid;
+        return newGrid;
     }
-
-    public bool IsInBounds(Vector2Short pos){
-        if (GridUtility.IsInBounds(pos, Vector2Short.Zero, GridSize)) return true;
-        else return false;
-    }
-
-    // Changed Cells
-    public ref List<Vector2Short> GetChangedCells(){
-        return ref changedCells;
-    }
-
-    public void ClearChangedCells(){
-        changedCells.Clear();
-    }
-
-    public void AddChangedCell(Vector2Short pos){
-        changedCells.Add(pos);
-    }
-
 }

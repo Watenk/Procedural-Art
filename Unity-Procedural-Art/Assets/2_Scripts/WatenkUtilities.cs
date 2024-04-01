@@ -141,6 +141,7 @@ public static class ColorUtility{
 }
 }
 
+// TODO: add object pool
 [Serializable]
 public class Vector2Short 
 {

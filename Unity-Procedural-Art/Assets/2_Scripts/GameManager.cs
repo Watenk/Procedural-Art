@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
         AddService(new Profiler());
 
         AddService(new GridManager());
+        AddService(new GridRenderer(GetService<GridManager>().GetGrid<Cell>(), Settings.Instance.CellTypeAtlas, Settings.Instance.CellTypeAtlasSize, Settings.Instance.CellTypeSpriteSize));
         AddService(new LightManager());
         AddService(new PlantManager());
         AddService(new MapGenerator());

@@ -12,9 +12,10 @@ public class GridDebugger : IPhysicsUpdateable
     //----------------------------------------------
 
     public GridDebugger(){
-        energyGridDebugger = new EnergyGridDebugger();
-        lightGridDebugger = new LightGridDebugger();
-        geneGridDebugger = new GeneGridDebugger();
+        Vector2Short gridsSize = Settings.Instance.GridSize;
+        energyGridDebugger = new EnergyGridDebugger(gridsSize);
+        lightGridDebugger = new LightGridDebugger(gridsSize);
+        geneGridDebugger = new GeneGridDebugger(gridsSize);
     }
 
     public void OnPhysicsUpdate(){
@@ -27,23 +28,17 @@ public class GridDebugger : IPhysicsUpdateable
 public abstract class SingleValueGridDebugger : IPhysicsUpdateable
 {
     protected Text[,] debugTexts;
-
-    // Cache
-    private GameObject singleValueGridPrefab;
-
-    // Dependencies
-    protected IGrid grid;
+    protected readonly Vector2Short size;
 
     //-------------------------------------
 
-    public SingleValueGridDebugger(){
-        grid = GameManager.GetService<GridManager>();
-        singleValueGridPrefab = Settings.Instance.SingleValueGridPrefab;
+    public SingleValueGridDebugger(Vector2Short size){
+        this.size = size;
 
-        debugTexts = new Text[grid.GridSize.x, grid.GridSize.y];
-        for (int y = 0; y < grid.GridSize.y; y++){
-            for(int x = 0; x < grid.GridSize.x; x++){
-                GameObject gameObject = GameObject.Instantiate(singleValueGridPrefab, new Vector3(x, -y, 0), Quaternion.identity);
+        debugTexts = new Text[size.x, size.y];
+        for (int y = 0; y < size.y; y++){
+            for(int x = 0; x < size.x; x++){
+                GameObject gameObject = GameObject.Instantiate(Settings.Instance.SingleValueGridPrefab, new Vector3(x, -y, 0), Quaternion.identity);
                 debugTexts[x, y] = gameObject.GetComponentInChildren<Text>();
             }
         }
@@ -54,14 +49,31 @@ public abstract class SingleValueGridDebugger : IPhysicsUpdateable
 
 public class EnergyGridDebugger : SingleValueGridDebugger
 {
+    // Dependencies
+    private IGrid<GrowingPlant> growingPlantGrid;
+    private IGrid<LivingPlant> livingPlantGrid;
+
+    //--------------------------------------
+
+    public EnergyGridDebugger(Vector2Short size) : base(size){
+        growingPlantGrid = GameManager.GetService<GridManager>().GetGrid<GrowingPlant>();
+        livingPlantGrid = GameManager.GetService<GridManager>().GetGrid<LivingPlant>();
+    }
     public override void OnPhysicsUpdate(){
-        for (int y = 0; y < grid.GridSize.y; y++){
-            for(int x = 0; x < grid.GridSize.x; x++){
-                if (grid.GetCell(new Vector2Short(x, y)).PlantCell == null) {
+        for (int y = 0; y < size.y; y++){
+            for(int x = 0; x < size.x; x++){
+                if (growingPlantGrid.Get(new Vector2Short(x, y)).Equals(default(GrowingPlant))) { 
                     debugTexts[x, y].text = "";
                 }
                 else{
-                    debugTexts[x, y].text = grid.GetCell(new Vector2Short(x, y)).PlantCell.Energy.ToString();
+                    debugTexts[x, y].text = growingPlantGrid.Get(new Vector2Short(x, y)).Energy.ToString();
+                }
+
+                if (livingPlantGrid.Get(new Vector2Short(x, y)).Equals(default(LivingPlant))) {
+                    debugTexts[x, y].text = "";
+                }
+                else{
+                    debugTexts[x, y].text = livingPlantGrid.Get(new Vector2Short(x, y)).Energy.ToString();
                 }
             }
         }
@@ -70,10 +82,18 @@ public class EnergyGridDebugger : SingleValueGridDebugger
 
 public class LightGridDebugger : SingleValueGridDebugger
 {
+    private IGrid<Light> lightGrid;
+
+    //--------------------------------------
+
+    public LightGridDebugger(Vector2Short size) : base(size){
+        lightGrid = GameManager.GetService<GridManager>().GetGrid<Light>();
+    }
+
     public override void OnPhysicsUpdate(){
-        for (int y = 0; y < grid.GridSize.y; y++){
-            for(int x = 0; x < grid.GridSize.x; x++){
-                debugTexts[x, y].text = grid.GetCell(new Vector2Short(x, y)).LightLevel.ToString();
+        for (int y = 0; y < size.y; y++){
+            for(int x = 0; x < size.x; x++){
+                debugTexts[x, y].text = lightGrid.Get(new Vector2Short(x, y)).LightLevel.ToString();
             }
         }
     }
@@ -87,25 +107,27 @@ public class GeneGridDebugger : IPhysicsUpdateable
     private Text[,] downDebugTexts;
     private Text[,] rightDebugTexts;
 
+    private Vector2Short size;
+
     // Cache
     private GameObject geneGridDebugPrefab;
 
     // Dependencies
-    private IGrid grid;
+    private IGrid<GrowingPlant> growingPlantGrid;
 
     //-------------------------------------
 
-    public GeneGridDebugger(){
-        grid = GameManager.GetService<GridManager>();
+    public GeneGridDebugger(Vector2Short size){
+        growingPlantGrid = GameManager.GetService<GridManager>().GetGrid<GrowingPlant>();
         geneGridDebugPrefab = Settings.Instance.GeneGridDebugPrefab;
 
-        mainDebugTexts = new Text[grid.GridSize.x, grid.GridSize.y];
-        upDebugTexts = new Text[grid.GridSize.x, grid.GridSize.y];
-        leftDebugTexts = new Text[grid.GridSize.x, grid.GridSize.y];
-        downDebugTexts = new Text[grid.GridSize.x, grid.GridSize.y];
-        rightDebugTexts = new Text[grid.GridSize.x, grid.GridSize.y];
-        for (int y = 0; y < grid.GridSize.y; y++){
-            for(int x = 0; x < grid.GridSize.x; x++){
+        mainDebugTexts = new Text[size.x, size.y];
+        upDebugTexts = new Text[size.x, size.y];
+        leftDebugTexts = new Text[size.x, size.y];
+        downDebugTexts = new Text[size.x, size.y];
+        rightDebugTexts = new Text[size.x, size.y];
+        for (int y = 0; y < size.y; y++){
+            for(int x = 0; x < size.x; x++){
                 GameObject gameObject = GameObject.Instantiate(geneGridDebugPrefab, new Vector3(x, -y, 0), Quaternion.identity);
                 Text[] texts = gameObject.GetComponentsInChildren<Text>();
                 mainDebugTexts[x, y] = texts[0];
@@ -118,17 +140,17 @@ public class GeneGridDebugger : IPhysicsUpdateable
     }
 
     public void OnPhysicsUpdate(){
-        for (int y = 0; y < grid.GridSize.y; y++){
-            for(int x = 0; x < grid.GridSize.x; x++){
+        for (int y = 0; y < growingPlantGrid.GridSize.y; y++){
+            for(int x = 0; x < growingPlantGrid.GridSize.x; x++){
 
-                ref Cell cell = ref grid.GetCell(new Vector2Short(x, y));
-                if (cell.PlantCell == null) continue;
+                GrowingPlant growingPlant = growingPlantGrid.Get(new Vector2Short(x, y));
+                if (growingPlant.Equals(default(GrowingPlant))) continue;
                 
-                mainDebugTexts[x, y].text = cell.PlantCell.ThisGene.ToString();
-                upDebugTexts[x, y].text = cell.PlantCell.Genome.GetDirectionChromosome(cell.PlantCell.ThisGene).GetGene(Vector2Short.Up).ToString();
-                leftDebugTexts[x, y].text = cell.PlantCell.Genome.GetDirectionChromosome(cell.PlantCell.ThisGene).GetGene(Vector2Short.Left).ToString();;
-                downDebugTexts[x, y].text = cell.PlantCell.Genome.GetDirectionChromosome(cell.PlantCell.ThisGene).GetGene(Vector2Short.Down).ToString();;
-                rightDebugTexts[x, y].text = cell.PlantCell.Genome.GetDirectionChromosome(cell.PlantCell.ThisGene).GetGene(Vector2Short.Right).ToString();;
+                mainDebugTexts[x, y].text = growingPlant.Gene.ToString();
+                upDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Up).ToString();
+                leftDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Left).ToString();;
+                downDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Down).ToString();;
+                rightDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Right).ToString();;
             }
         }
     }

@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 using Watenk;
 
@@ -14,48 +10,55 @@ public class LightManager : IPhysicsUpdateable
     private int maxLight;
 
     // Dependencies
-    private IGrid grid;
+    private IGrid<Light> lightGrid;
+    private IGrid<Cell> cellGrid;
 
     //----------------------------------------
 
     public LightManager(){
-        grid = GameManager.GetService<GridManager>();
-        GridSize = grid.GridSize;
+        GridManager gridManager = GameManager.GetService<GridManager>();
+        lightGrid = gridManager.GetGrid<Light>();
+        cellGrid = gridManager.GetGrid<Cell>();
+        GridSize = gridManager.GridSize;
         minLight = Settings.Instance.MinLight;
         maxLight = Settings.Instance.MaxLight + 1;
     }
 
     public void OnPhysicsUpdate(){
+
         // LightSource
         for (int y = 0; y < 1; y++){
-            for(int x = 0; x < grid.GridSize.x; x++){
-                ref Cell currentCell = ref grid.GetCell(new Vector2Short(x, y));
+            for(int x = 0; x < lightGrid.GridSize.x; x++){
 
-                if (currentCell.CellType == CellTypes.air){
-                    currentCell.LightLevel = (byte)Random.Range(minLight, maxLight);
+                Light light = lightGrid.Get(new Vector2Short(x, y));
+                Cell cell = cellGrid.Get(new Vector2Short(x, y));
+
+                if (cell.CellType == CellTypes.air){
+                    light.LightLevel = (byte)Random.Range(minLight, maxLight);
                 }
                 else{
-                    currentCell.LightLevel= 0;
+                    light.LightLevel = 0;
                 }
             }
         }
 
         // Other
-        for (int y = 1; y < grid.GridSize.y; y++){
-            for(int x = 0; x < grid.GridSize.x; x++){
-                ref Cell upCell = ref grid.GetCell(new Vector2Short(x, y - 1));
-                ref Cell currentCell = ref grid.GetCell(new Vector2Short(x, y));
+        for (int y = 1; y < lightGrid.GridSize.y; y++){
+            for(int x = 0; x < lightGrid.GridSize.x; x++){
+                Cell upCell = cellGrid.Get(new Vector2Short(x, y - 1));
+                Light upLight = lightGrid.Get(new Vector2Short(x, y - 1));
+                Light light = lightGrid.Get(new Vector2Short(x, y));
                 
-                if (upCell.LightLevel != 0){
+                if (upLight.LightLevel != 0){
                     if (upCell.CellType != CellTypes.air){
-                        currentCell.LightLevel = (byte)(upCell.LightLevel - 1);
+                        light.LightLevel = (byte)(upLight.LightLevel - 1);
                     }
                     else{
-                        currentCell.LightLevel = upCell.LightLevel;
+                        light.LightLevel = upLight.LightLevel;
                     }
                 }
                 else{
-                    currentCell.LightLevel = 0;
+                    light.LightLevel = 0;
                 }
             }
         }
