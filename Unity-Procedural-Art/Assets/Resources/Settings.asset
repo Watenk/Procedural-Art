@@ -18,7 +18,7 @@ MonoBehaviour:
   UPSTarget: 60
   GridSize:
     x: 200
-    y: 100
+    y: 150
   DesiredChunkSize:
     x: 10
     y: 10
@@ -36,9 +36,9 @@ MonoBehaviour:
   DirectionChromosomeAmount: 30
   InactiveDirectionChromosomeAmount: 20
   ChromosomeMutationChance: 20
-  PlantDieAge: 3000
+  PlantDieAge: 1500
   SeedGrowAge: 300
-  RotAge: 1000
+  RotAge: 500
   EatingDelay: 10
   WoodEnergyTransferAmount: 2
   LeavesEnergyTransferAmount: 1
