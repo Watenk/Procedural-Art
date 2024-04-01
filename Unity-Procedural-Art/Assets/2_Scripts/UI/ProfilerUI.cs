@@ -50,8 +50,8 @@ public class ProfilerUI
         debugTextString += "\n";
 
         // Remaining time
-        debugTextString += "Remaining: " + MathUtility.SetDecimals(profiler.RemainingTime, 1) + "ms" + "\n";
-        debugTextString += "\n";
+        // debugTextString += "Remaining: " + MathUtility.SetDecimals(profiler.RemainingTime, 1) + "ms" + "\n";
+        // debugTextString += "\n";
 
         profilerText.text = debugTextString;
 

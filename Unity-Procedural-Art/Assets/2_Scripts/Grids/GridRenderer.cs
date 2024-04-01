@@ -70,7 +70,7 @@ public class GridRenderer : IUpdateable, IGridRenderer
         changedCells.Clear();
     }
 
-    public void Change(Vector2Short pos){
+    public void Update(Vector2Short pos){
         if (!changedCells.Contains(pos)) changedCells.Add(pos);
     }
 

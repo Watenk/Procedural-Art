@@ -31,14 +31,9 @@ public class LightManager : IPhysicsUpdateable
             for(int x = 0; x < lightGrid.GridSize.x; x++){
 
                 Light light = lightGrid.Get(new Vector2Short(x, y));
-                Cell cell = cellGrid.Get(new Vector2Short(x, y));
 
-                if (cell.CellType == CellTypes.air){
-                    light.LightLevel = (byte)Random.Range(minLight, maxLight);
-                }
-                else{
-                    light.LightLevel = 0;
-                }
+                light.LightLevel = (byte)Random.Range(minLight, maxLight);
+                lightGrid.Set(new Vector2Short(x, y), light);
             }
         }
 
@@ -60,6 +55,8 @@ public class LightManager : IPhysicsUpdateable
                 else{
                     light.LightLevel = 0;
                 }
+
+                lightGrid.Set(new Vector2Short(x, y), light);
             }
         }
     }

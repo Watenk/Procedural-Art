@@ -1,9 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct SeedPlant
+public class SeedPlant
 {
-    public Genome Genome { get; set; }
-    public byte Energy { get; set; }
+    public ushort LifeTime;
+    public Genome Genome;
+    public byte Energy;
+
+    //----------------------------------
+
+    private SeedPlant() {}
+
+    public SeedPlant(Genome genome, byte startEnergy){
+        LifeTime = 0;
+        Genome = genome;
+        Energy = startEnergy;
+    }
 }

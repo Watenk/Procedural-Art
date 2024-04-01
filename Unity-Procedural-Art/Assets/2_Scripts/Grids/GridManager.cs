@@ -15,16 +15,23 @@ public class GridManager
     public GridManager(){
         GridSize = Settings.Instance.GridSize;
 
-        AddArrayGrid<Cell>();
-        AddArrayGrid<Light>();
+        IGrid<Cell> cellGrid = AddArrayGrid<Cell>();
+        IGrid<Light> lightGrid = AddArrayGrid<Light>();
 
-        AddListGrid<SeedPlant>();
-        AddListGrid<GrowingPlant>();
-        AddListGrid<LivingPlant>();
-        AddListGrid<DeadPlant>();
+        for (int y = 0; y < GridSize.y; y++){
+            for(int x = 0; x < GridSize.x; x++){
+                cellGrid.Set(new Vector2Short(x, y), new Cell(CellTypes.air));
+                lightGrid.Set(new Vector2Short(x, y), new Light(0));
+            }
+        }
+
+        AddArrayGrid<SeedPlant>();
+        AddArrayGrid<GrowingPlant>();
+        AddArrayGrid<LivingPlant>();
+        AddArrayGrid<DeadPlant>();
     }
 
-    public IGrid<T> GetGrid<T>() where T : new(){
+    public IGrid<T> GetGrid<T>() where T : class{
         if (arrayGrids.TryGetValue(typeof(T), out object arrayGrid)){
             return (ArrayGrid<T>)arrayGrid;
         }
@@ -37,13 +44,13 @@ public class GridManager
         }
     }
 
-    public IGrid<T> AddArrayGrid<T>() where T : new(){
+    public IGrid<T> AddArrayGrid<T>() where T : class{
         ArrayGrid<T> newGrid = new ArrayGrid<T>(GridSize);
         arrayGrids[typeof(T)] = newGrid;
         return newGrid;
     }
 
-    public IGrid<T> AddListGrid<T>() where T : new(){
+    public IGrid<T> AddListGrid<T>() where T : class{
         ListGrid<T> newGrid = new ListGrid<T>(GridSize);
         listGrids[typeof(T)] = newGrid;
         return newGrid;

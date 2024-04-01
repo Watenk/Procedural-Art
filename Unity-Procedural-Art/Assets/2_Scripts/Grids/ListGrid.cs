@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Watenk;
 
-public class ListGrid<T> : IGrid<T>
+public class ListGrid<T> : IGrid<T> where T : class
 {
     public Vector2Short GridSize { get; }
 
@@ -23,10 +23,10 @@ public class ListGrid<T> : IGrid<T>
     public T Get(Vector2Short pos){
 
         ListData<T> listData = values[pos.x].Find((data) => pos == data.Pos);
-        if (!listData.Equals(default(ListData<T>))){
+        if (listData.Data != null){
             return listData.Data;
         }
-        return default;
+        return null;
     }
 
     public void Set(Vector2Short pos, T newData){

@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Watenk;
 
-public class ArrayGrid<T> : IGrid<T> where T : new()
+public class ArrayGrid<T> : IGrid<T> where T : class
 {
     public Vector2Short GridSize { get; }
 
@@ -17,7 +18,7 @@ public class ArrayGrid<T> : IGrid<T> where T : new()
         data = new T[size.x, size.y];
         for (int y = 0; y < size.y; y++){
             for(int x = 0; x < size.x; x++){
-                data[x, y] = new T();
+                data[x, y] = null;
             }
         }
     }

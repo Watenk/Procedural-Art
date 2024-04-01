@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IGridRenderer
 {
-    public void Change(Vector2Short pos);
+    public void Update(Vector2Short pos);
 }

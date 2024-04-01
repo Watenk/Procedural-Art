@@ -14,21 +14,12 @@ public class MapGenerator
         cellGrid = GameManager.GetService<GridManager>().GetGrid<Cell>();
         gridRenderer = GameManager.GetService<GridRenderer>();
 
-        for (int y = 0; y < cellGrid.GridSize.y; y++){
-            for(int x = 0; x < cellGrid.GridSize.x; x++){
-                Cell currentCell = cellGrid.Get(new Vector2Short(x, y));
-                currentCell.CellType = CellTypes.air;
-                cellGrid.Set(new Vector2Short(x, y), currentCell);
-                gridRenderer.Change(new Vector2Short(x, y));
-            }
-        }
-
         for (int y = cellGrid.GridSize.y - 5; y < cellGrid.GridSize.y; y++){
             for(int x = 0; x < cellGrid.GridSize.x; x++){
                 Cell currentCell = cellGrid.Get(new Vector2Short(x, y));
                 currentCell.CellType = CellTypes.dirt;
                 cellGrid.Set(new Vector2Short(x, y), currentCell);
-                gridRenderer.Change(new Vector2Short(x, y));
+                gridRenderer.Update(new Vector2Short(x, y));
             }
         }
     }

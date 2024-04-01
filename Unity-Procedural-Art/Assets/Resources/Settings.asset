@@ -15,10 +15,10 @@ MonoBehaviour:
   MinCamSize: 1
   MaxCamSize: 1000
   ScrollSpeed: 5
-  UPSTarget: 24
+  UPSTarget: 60
   GridSize:
-    x: 1000
-    y: 200
+    x: 20
+    y: 20
   DesiredChunkSize:
     x: 10
     y: 10
@@ -31,8 +31,8 @@ MonoBehaviour:
     x: 32
     y: 32
   ProfilerUpdateSpeed: 0.1
-  MinLight: 3
-  MaxLight: 5
+  MinLight: 1
+  MaxLight: 3
   DirectionChromosomeAmount: 30
   InactiveDirectionChromosomeAmount: 20
   ChromosomeMutationChance: 20

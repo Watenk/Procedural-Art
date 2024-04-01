@@ -52,28 +52,37 @@ public class EnergyGridDebugger : SingleValueGridDebugger
     // Dependencies
     private IGrid<GrowingPlant> growingPlantGrid;
     private IGrid<LivingPlant> livingPlantGrid;
+    private IGrid<SeedPlant> seedPlantGrid;
 
     //--------------------------------------
 
     public EnergyGridDebugger(Vector2Short size) : base(size){
         growingPlantGrid = GameManager.GetService<GridManager>().GetGrid<GrowingPlant>();
         livingPlantGrid = GameManager.GetService<GridManager>().GetGrid<LivingPlant>();
+        seedPlantGrid = GameManager.GetService<GridManager>().GetGrid<SeedPlant>();
+
+        for (int y = 0; y < size.y; y++){
+            for(int x = 0; x < size.x; x++){
+                debugTexts[x, y].gameObject.GetComponent<RectTransform>().pivot = new Vector2(0.2f, 0.8f);
+                debugTexts[x, y].color = Color.blue;
+            }
+        }
     }
+
     public override void OnPhysicsUpdate(){
         for (int y = 0; y < size.y; y++){
             for(int x = 0; x < size.x; x++){
-                if (growingPlantGrid.Get(new Vector2Short(x, y)).Equals(default(GrowingPlant))) { 
-                    debugTexts[x, y].text = "";
-                }
-                else{
+                if (growingPlantGrid.Get(new Vector2Short(x, y)) != null) { 
                     debugTexts[x, y].text = growingPlantGrid.Get(new Vector2Short(x, y)).Energy.ToString();
                 }
-
-                if (livingPlantGrid.Get(new Vector2Short(x, y)).Equals(default(LivingPlant))) {
-                    debugTexts[x, y].text = "";
+                else if (seedPlantGrid.Get(new Vector2Short(x, y)) != null){
+                    debugTexts[x, y].text = seedPlantGrid.Get(new Vector2Short(x, y)).Energy.ToString();
+                }
+                else if (livingPlantGrid.Get(new Vector2Short(x, y)) != null){
+                    debugTexts[x, y].text = livingPlantGrid.Get(new Vector2Short(x, y)).Energy.ToString();
                 }
                 else{
-                    debugTexts[x, y].text = livingPlantGrid.Get(new Vector2Short(x, y)).Energy.ToString();
+                    debugTexts[x, y].text = "";
                 }
             }
         }
@@ -88,6 +97,13 @@ public class LightGridDebugger : SingleValueGridDebugger
 
     public LightGridDebugger(Vector2Short size) : base(size){
         lightGrid = GameManager.GetService<GridManager>().GetGrid<Light>();
+
+        for (int y = 0; y < size.y; y++){
+            for(int x = 0; x < size.x; x++){
+                debugTexts[x, y].gameObject.GetComponent<RectTransform>().pivot = new Vector2(0.8f, 0.2f);
+                debugTexts[x, y].color = Color.yellow;
+            }
+        }
     }
 
     public override void OnPhysicsUpdate(){
@@ -114,11 +130,13 @@ public class GeneGridDebugger : IPhysicsUpdateable
 
     // Dependencies
     private IGrid<GrowingPlant> growingPlantGrid;
+    private IGrid<SeedPlant> seedPlantGrid;
 
     //-------------------------------------
 
     public GeneGridDebugger(Vector2Short size){
         growingPlantGrid = GameManager.GetService<GridManager>().GetGrid<GrowingPlant>();
+        seedPlantGrid = GameManager.GetService<GridManager>().GetGrid<SeedPlant>();
         geneGridDebugPrefab = Settings.Instance.GeneGridDebugPrefab;
 
         mainDebugTexts = new Text[size.x, size.y];
@@ -144,13 +162,22 @@ public class GeneGridDebugger : IPhysicsUpdateable
             for(int x = 0; x < growingPlantGrid.GridSize.x; x++){
 
                 GrowingPlant growingPlant = growingPlantGrid.Get(new Vector2Short(x, y));
-                if (growingPlant.Equals(default(GrowingPlant))) continue;
-                
-                mainDebugTexts[x, y].text = growingPlant.Gene.ToString();
-                upDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Up).ToString();
-                leftDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Left).ToString();;
-                downDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Down).ToString();;
-                rightDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Right).ToString();;
+                if (growingPlant != null){
+                    mainDebugTexts[x, y].text = growingPlant.Gene.ToString();
+                    upDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Up).ToString();
+                    leftDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Left).ToString();;
+                    downDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Down).ToString();;
+                    rightDebugTexts[x, y].text = growingPlant.Genome.GetDirectionChromosome(growingPlant.Gene).GetGene(Vector2Short.Right).ToString();;
+                }
+
+                GrowingPlant seedPlant = growingPlantGrid.Get(new Vector2Short(x, y));
+                if (seedPlant != null){
+                    mainDebugTexts[x, y].text = seedPlant.Gene.ToString();
+                    upDebugTexts[x, y].text = seedPlant.Genome.GetDirectionChromosome(seedPlant.Gene).GetGene(Vector2Short.Up).ToString();
+                    leftDebugTexts[x, y].text = seedPlant.Genome.GetDirectionChromosome(seedPlant.Gene).GetGene(Vector2Short.Left).ToString();;
+                    downDebugTexts[x, y].text = seedPlant.Genome.GetDirectionChromosome(seedPlant.Gene).GetGene(Vector2Short.Down).ToString();;
+                    rightDebugTexts[x, y].text = seedPlant.Genome.GetDirectionChromosome(seedPlant.Gene).GetGene(Vector2Short.Right).ToString();;
+                }
             }
         }
     }

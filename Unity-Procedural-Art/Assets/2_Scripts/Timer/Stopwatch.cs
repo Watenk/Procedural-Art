@@ -40,4 +40,8 @@ public class Stopwatch
         previousTime = UnityEngine.Time.realtimeSinceStartup;
         Runnning = true;
     }
+
+    public void SetTime(float time){
+        Time = time;
+    }
 }
